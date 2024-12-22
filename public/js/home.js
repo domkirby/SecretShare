@@ -6,7 +6,14 @@ $(document).ready(function() {
         e.preventDefault();
         const key = await generateRandomKey();
         const plaintext = $("#secret").val();
-        const encryptedData = await encryptData(key, plaintext);
+        try {
+            const encryptedData = await encryptData(key, plaintext);
+        } catch(error) {
+            console.error("Error encrypting data:", error);
+            $("#errors").text("Error encrypting data. Please refresh and retry.");
+            $("#errors").show();
+        }
+        
         
         $("#encryptedSecret").val(encryptedData);
         var payload = form.serialize();
