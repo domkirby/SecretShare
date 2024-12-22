@@ -2,9 +2,12 @@ $(document).ready(function() {
     console.log("Document ready");
     const hash = window.location.hash;
     const secretKey = hash.substring(1);
-
+    const spinner = $("#loading");
+    const submitBtn = $("#submitButton");
     $("#retrieveSecretForm").on("submit", async function(e) {
         e.preventDefault();
+        spinner.show();
+        submitBtn.prop("disabled", true);
         var secretId = $("#secretId").val();
         var payload = {
             token: $("#csrfToken").val()
@@ -34,6 +37,8 @@ $(document).ready(function() {
             error: function($xhr) {
                 $("#errors").text($xhr.responseJSON.error);
                 $("#errors").show();
+                //spinner.hide();
+                //submitBtn.prop("disabled", false);
             }
         });
     });

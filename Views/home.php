@@ -49,7 +49,10 @@
                 </div>
                 <div class="mb-3">
                     <input type="hidden" name="token" value="<?php echo $this->CSRF_TOKEN; ?>">
-                    <button type="submit" class="btn btn-primary">Save Secret</button>
+                    <button type="submit" class="btn btn-primary" id="submitButton">Save Secret</button>
+                    <div class="spinner-border" role="status" id="loading" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
             </form>
         </div>

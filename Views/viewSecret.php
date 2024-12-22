@@ -21,7 +21,10 @@
                 <div class="mb-3">
                     <input type="hidden" name="secretId" id="secretId" value="<?php echo $secretId; ?>">
                     <input type="hidden" name="csrfToken" id="csrfToken" value="<?php echo $this->CSRF_TOKEN; ?>">
-                    <button type="submit" class="btn btn-primary btn-lg">Retrieve Secret</button>
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitButton">Retrieve Secret</button>
+                    <div class="spinner-border" role="status" id="loading" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
             </form>
         </div>
