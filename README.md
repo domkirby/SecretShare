@@ -51,7 +51,7 @@ A cron job or scheduled task should run every minute to ensure that expired secr
 **HTTP:**
 
 - Define the `CRON_SECRET` constant as a random, URL safe value
-- Call the `https://your.host.name/cron/{CRON_SECRET}` every minute
+- Call the `https://your.host.name/cron/{CRON_SECRET}` endpoint every minute
 
 ## SecretShare Requires Its Own Hostname
 This tool must run in its on hostname, but a subdomain is acceptable. For example, using `share.example.com` should work great but using `example.com/share` will *not* work.
