@@ -43,7 +43,7 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="/js/encryption.js" integrity="sha384-Fyh9qg3rXRie1Dz4CwjHqluEJbSpB4PcEZEV4GTGUNI3YdzSBirsFaffKgkEY5qA"></script>
+    <script src="/js/encryption.js"></script>
     <script>
         const csrfToken = "<?php echo $this->CSRF_TOKEN; ?>";
     </script>
