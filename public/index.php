@@ -25,6 +25,11 @@ $router->get('/', function() {
     $HANDLER->home();
 });
 
+$router->get('/about', function() {
+    global $HANDLER;
+    $HANDLER->about();
+});
+
 $router->get('/secret/{secretId}', function($secretId) {
     global $HANDLER;
     $db = new SecretShareDatabase();

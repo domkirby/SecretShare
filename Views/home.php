@@ -6,6 +6,7 @@
     <title><?php echo UI_TITLE; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-dark.min.css" rel="stylesheet" crossorigin="anonymous" media="(prefers-color-scheme: dark)">
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -55,6 +56,9 @@
                     </div>
                 </div>
             </form>
+            <div class="mb-3 text-end">
+                <a href="/about" class="btn btn-outline-primary btn-sm">About This Tool</a>
+            </div>
         </div>
         <div class="container-sm inner-content-container" id="secretLinkContainer" style="display: none;">
             <h1>Secret Created!</h1>

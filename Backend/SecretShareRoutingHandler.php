@@ -16,6 +16,12 @@ class SecretShareRoutingHandler {
         exit();
     }
 
+    public function about(): void
+    {
+        require $this->viewDirectory . "about.php";
+        exit();
+    }
+
     public function viewSecretPage(string $secretId): void
     {
         require $this->viewDirectory . "viewSecret.php";
