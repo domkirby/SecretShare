@@ -2,11 +2,6 @@
 
 class SecretShareCryptography
 {
-    public static function hashUniqueId(string $id): string
-    {
-        return base64_encode(hash_hmac('sha256', $id, STORAGE_HASH_SECRET, true));
-    }
-
     public static function encryptData(string $data): string
     {
         $ivLength = openssl_cipher_iv_length('aes-256-gcm');
@@ -60,10 +55,26 @@ class SecretShareCryptography
 
     public static function generateUniqueId(): string
     {
-        $randomBytes = random_bytes(16);
-        $uniqid = uniqid('', true);
+        $randomBytes = random_bytes(16); //Random bytes are used to ensure the uniqueness and sufficient randomness (128 bits) of the ID
+        $uniqid = uniqid('', true); //Uniqid is used to ensure we do not have collisions
+        $hash = hash('sha256', $uniqid . $randomBytes, true); //hash these together
+        return self::base64UrlEncode($hash); //base64 encode the hash (URL Safe)
+    }
 
-        return hash('sha256', $uniqid . $randomBytes);
+    public static function generateHmac(string $data): string
+    {
+        $hmac = hash_hmac('sha256', $data, SERVER_SIDE_HMAC_SECRET, true);
+        return self::base64UrlEncode($hmac);
+    }
+
+    public static function base64UrlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    public static function base64UrlDecode(string $data): string
+    {
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
 }
 

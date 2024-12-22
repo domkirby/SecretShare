@@ -19,6 +19,8 @@
   define('SERVER_SIDE_ENCRYPTION_KEY', 'YOUR_RANDOM_KEY'); //The key that the server will use to encrypt user secrets. NOTE: This is encrypting the client-side encrypted data for additional protection.
   # To generate this, run "openssl rand -hex 32" in your terminal.
 
+  define('SERVER_SIDE_HMAC_SECRET', 'RANDOM_HMAC_SECRET'); //The HMAC secret used to mask the ID in the database (making it difficult to match the database value to the URL value). This should be a random value.
+
   /**
    * Cron Secret
    * This secret only applies if using the cron via HTTP to /cron/{secret} to delete expired secrets. 

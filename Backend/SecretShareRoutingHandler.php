@@ -79,6 +79,8 @@ class SecretShareRoutingHandler {
     
             // Generate a unique secret ID
             $secretId = SecretShareCryptography::generateUniqueId();
+
+            $secretDatabaseId = SecretShareCryptography::generateHmac($secretId);
     
             // Parse expiration date
             $expirationTime = SecretShareParser::parseExpirationDate($expirationPeriod, $expirationUnit);
@@ -88,7 +90,7 @@ class SecretShareRoutingHandler {
     
             // Store the secret in the database
             $database = new SecretShareDatabase();
-            $database->addSecret($secretId, $expirationTime, $maxViews, 0, $encryptedSecret);
+            $database->addSecret($secretDatabaseId, $expirationTime, $maxViews, 0, $encryptedSecret);
     
             // Respond with success message
             echo json_encode([
@@ -113,7 +115,8 @@ class SecretShareRoutingHandler {
             }
             // Retrieve secret from database
             $database = new SecretShareDatabase();
-            $secret = $database->fetchSecret($secretId);
+            $databaseId = SecretShareCryptography::generateHmac($secretId);
+            $secret = $database->fetchSecret($databaseId);
     
             // Decrypt secret
             $decryptedSecret = SecretShareCryptography::decryptData($secret['secret_value']);

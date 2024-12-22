@@ -33,7 +33,8 @@ $router->get('/about', function() {
 $router->get('/secret/{secretId}', function($secretId) {
     global $HANDLER;
     $db = new SecretShareDatabase();
-    if($db->secretExists($secretId)) {
+    $secretIdHmac = SecretShareCryptography::generateHmac($secretId);
+    if($db->secretExists($secretIdHmac)) {
         $HANDLER->viewSecretPage($secretId);
     } else {
         $HANDLER->notFound();
