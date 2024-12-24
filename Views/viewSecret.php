@@ -19,6 +19,11 @@
 
             </div>
             <form action="#" id="retrieveSecretForm">
+                <div class="mb-3" id="passwordDiv" style="display: none;">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" class="form-control" required disabled>
+                    <div class="form-text">This password was provided when the secret was created. If you do not have the password, you will not be able to retrieve the secret.</div>
+                </div>
                 <div class="mb-3">
                     <input type="hidden" name="secretId" id="secretId" value="<?php echo $secretId; ?>">
                     <input type="hidden" name="csrfToken" id="csrfToken" value="<?php echo $this->CSRF_TOKEN; ?>">

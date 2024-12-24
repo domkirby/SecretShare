@@ -49,6 +49,16 @@
                     <div class="form-text">Secrets cannot be stored more than 5 days.</div>
                 </div>
                 <div class="mb-3">
+                    <input type="checkbox" name="" id="useCustomPassword" class="form-check-input">
+                    <label for="useCustomPassword" class="form-check-label">Use a custom password?</label>
+                    <div class="form-text">By default, a random password will be appended to the end of the URL. If you wish to use your own password instead, check this box.</div>
+                </div>
+                <div class="mb-3" id="customPasswordDiv" style="display: none;">
+                    <label for="customPassword" class="form-label">Custom Password:</label>
+                    <input type="password" id="customPassword" class="form-control" disabled>
+                    <div class="form-text">This password will be required to view the secret. <strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password.</div>
+                </div>
+                <div class="mb-3">
                     <input type="hidden" name="token" value="<?php echo $this->CSRF_TOKEN; ?>">
                     <button type="submit" class="btn btn-primary" id="submitButton">Save Secret</button>
                     <div class="spinner-border" role="status" id="loading" style="display: none;">

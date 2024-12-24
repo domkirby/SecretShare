@@ -4,22 +4,65 @@ $(document).ready(function() {
     const form = $("#secretForm");
     const spinner = $("#loading");
     const submitBtn = $("#submitButton");
+    const passwordCheckbox = $("#useCustomPassword");
+    const passwordInput = $("#customPassword");
+    const customPasswordDiv = $("#customPasswordDiv");
+
+    passwordCheckbox.on("change", function() {
+        console.log("Checkbox changed");
+        if(passwordCheckbox.is(":checked")) {
+            customPasswordDiv.show();
+            passwordInput.attr("required", true);
+            passwordInput.attr('disabled', false);
+        } else {
+            customPasswordDiv.hide();
+            passwordInput.attr("required", false);
+            passwordInput.attr('disabled', true);
+        }
+    });
+
     form.on("submit", async function(e) {
         e.preventDefault();
-        const key = await generateRandomKey();
+        var isCustomPassword = false;
+        const keysetPayload = {};
+        var key = '';
+        if(passwordCheckbox.is(":checked")) {
+            const pbKeyset = await generatePBKDF2Key(passwordInput.val());
+            keysetPayload.salt = pbKeyset.salt;
+            keysetPayload.iterations = pbKeyset.iterations;
+            keysetPayload.saltLength = pbKeyset.saltLength;
+            key = pbKeyset.key;
+            isCustomPassword = true;
+        } else {
+            key = await generateRandomKey();
+        }
         const plaintext = $("#secret").val();
         submitBtn.prop("disabled", true);
         spinner.show();
         try {
             const encryptedData = await encryptData(key, plaintext);
-            $("#encryptedSecret").val(encryptedData);
-                var payload = form.serialize();
+            if(isCustomPassword) {
+                keysetPayload.data = encryptedData;
+                keysetPayload.customPassword = true;
+                $("#encryptedSecret").val(JSON.stringify(keysetPayload));
+            } else {
+                keysetPayload.customPassword = false;
+                keysetPayload.data = encryptedData;
+                $("#encryptedSecret").val(JSON.stringify(keysetPayload));
+            }
+            
+            var payload = form.serialize();
                 $.ajax({
                     method: "POST",
                     url: "/api/saveSecret",
                     data: payload,
                     success: function(data) {
-                        var secretUrl = `https://${windowHost}/secret/${data.secret_id}#${key}`;
+                        var secretUrl = '';
+                        if(isCustomPassword) {
+                            secretUrl = `https://${windowHost}/secret/${data.secret_id}`;
+                        } else {
+                            secretUrl = `https://${windowHost}/secret/${data.secret_id}#${key}`;
+                        }
                         $("#secretLink").val(secretUrl);
                         $("#secretLinkContainer").show();
                         $("#createSecretContainer").hide();

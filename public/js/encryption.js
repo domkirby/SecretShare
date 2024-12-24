@@ -76,21 +76,48 @@ async function decryptData(keyHex, encryptedData) {
     }
 }
 
-// Example usage
-/*
-(async () => {
-    const key = await generateRandomKey();
-    console.log("Generated Key:", key);
+async function generatePBKDF2Key(password, saltLength = 16, iterations = 350000, providedSalt = null) {
+    // Generate a random salt or use the provided Base64 salt
+    const salt = providedSalt 
+        ? Uint8Array.from(atob(providedSalt), c => c.charCodeAt(0))
+        : crypto.getRandomValues(new Uint8Array(saltLength));
 
-    try {
-        const plaintext = "Hello, world!";
-        const encryptedData = await encryptData(key, plaintext);
-        console.log("Encrypted Data:", encryptedData);
+    // Convert the password to a Uint8Array
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
 
-        const decryptedData = await decryptData(key, encryptedData);
-        console.log("Decrypted Data:", decryptedData);
-    } catch (error) {
-        console.error("An error occurred during encryption or decryption:", error);
-    }
-})();
-*/
+    // Import the password as a key
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        passwordBuffer,
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits"]
+    );
+
+    // Derive the key using PBKDF2
+    const derivedBits = await crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: iterations,
+            hash: "SHA-256",
+        },
+        keyMaterial,
+        256
+    );
+
+    // Convert the derived bits to a Uint8Array
+    const derivedKey = new Uint8Array(derivedBits);
+
+    // Convert the derived key to hex
+    const keyHex = Array.from(derivedKey).map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+    // Return the derived key as hex, the salt as Base64, and the number of iterations
+    return {
+        key: keyHex,
+        salt: btoa(String.fromCharCode(...salt)),
+        iterations: iterations,
+        saltLength: salt.length
+    };
+}
