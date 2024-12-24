@@ -1,2 +1,3 @@
 _config.php
 /composer.lock
+*.bak
