@@ -56,7 +56,8 @@
                 <div class="mb-3" id="customPasswordDiv" style="display: none;">
                     <label for="customPassword" class="form-label">Custom Password:</label>
                     <input type="password" id="customPassword" class="form-control" disabled>
-                    <div class="form-text">This password will be required to view the secret. <strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password.</div>
+                    <div class="form-text">This password will be required to view the secret.</div>
+                    <div class="alert alert-warning form-text"><strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password. If you lose this password, it will be impossible to view the contents of the secret.</div>
                 </div>
                 <div class="mb-3">
                     <input type="hidden" name="token" value="<?php echo $this->CSRF_TOKEN; ?>">
