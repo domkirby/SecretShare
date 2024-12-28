@@ -32,9 +32,10 @@
                 <div class="mb-3">
                     <label for="maxViews" class="form-label">Max Views:</label>
                     <div class="input-group">
-                        <input type="number" id="maxViews" class="form-control" name="max_views" value="1" required>
+                        <input type="number" id="maxViews" class="form-control" name="max_views" value="1" max="<?php echo MAXIMUM_VIEWS; ?>" required>
                         <span class="input-group-text">Views</span>
                     </div>
+                    <div class="form-text">You can set up to <?php echo htmlspecialchars(MAXIMUM_VIEWS); ?> views.</div>
                 </div>
                 <div class="mb-3">
                     <label for="expiration" class="form-label">Expire After:</label>

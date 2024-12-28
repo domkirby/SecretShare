@@ -15,11 +15,16 @@
  /**
   * Encryption Settings.
   * Set unique and RANDOM encryption values. Heed the example commands below.
+  * DEPRECATED: SERVER_SIDE_ENCRYPTION_KEY is no longer used for encryption. Instead, a server side key is derived from the secret ID, meaning it is not persisted on the server.
   */
-  define('SERVER_SIDE_ENCRYPTION_KEY', 'YOUR_RANDOM_KEY'); //The key that the server will use to encrypt user secrets. NOTE: This is encrypting the client-side encrypted data for additional protection.
+  # define('SERVER_SIDE_ENCRYPTION_KEY', 'YOUR_RANDOM_KEY'); //The key that the server will use to encrypt user secrets. NOTE: This is encrypting the client-side encrypted data for additional protection.
   # To generate this, run "openssl rand -hex 32" in your terminal.
 
-  define('SERVER_SIDE_HMAC_SECRET', 'RANDOM_HMAC_SECRET'); //The HMAC secret used to mask the ID in the database (making it difficult to match the database value to the URL value). This should be a random value.
+
+  //The HMAC secret used to mask the ID in the database (making it difficult to match the database value to the URL value). This should be a random value.
+  //This also prevents anyone from deriving the encryption key from the secret ID, since only this hash is stored in the database.
+  //To generate this, run "openssl rand -hex 32" in your terminal.
+  define('SERVER_SIDE_HMAC_SECRET', 'RANDOM_HMAC_SECRET'); 
 
   /**
    * Cron Secret
@@ -27,6 +32,20 @@
    * This is a security measure to prevent unauthorized access to the cron script and should be a random, URL safe value.
    */
   define('CRON_SECRET', 'YOUR_RANDOM_HTTP_CRON_SECRET');
+
+  /**
+   * PBKDF2 Iterations
+   * This value is used to derive the encryption key from the password. The higher the value, the more secure the encryption, but the slower the process.
+   * The default value is 100,000, which is a good balance between security and performance.
+   */
+  define('PBKDF2_ITERATIONS', 100000);
+
+  /**
+   * Maximum Views
+   * This value sets the maximum number of views a secret can have before it is deleted. This is a security measure to prevent the secret from being viewed too many times.
+   * This impacts the maximum number of views a person can choose on the front end.
+   */
+  define('MAXIMUM_VIEWS', 5);
 
 /**
  * UI SETTINGS

@@ -1,3 +1,4 @@
 _config.php
 /composer.lock
 *.bak
+debugging.php

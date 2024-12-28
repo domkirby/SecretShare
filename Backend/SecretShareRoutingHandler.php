@@ -73,12 +73,21 @@ class SecretShareRoutingHandler {
             if ($expirationPeriod > $maxPeriod) {
                 throw new Exception("Invalid expiration period. Maximum allowed for $expirationUnit is $maxPeriod.");
             }
-    
-            // Encrypt the secret
-            $encryptedSecret = SecretShareCryptography::encryptData($secret);
-    
+            if($maxViews > MAXIMUM_VIEWS) {
+                throw new Exception("Invalid max views. Maximum allowed is " . MAXIMUM_VIEWS);
+            }
+
             // Generate a unique secret ID
             $secretId = SecretShareCryptography::generateUniqueId();
+
+            //Generate a salt
+            $salt = SecretShareCryptography::generateSalt();
+
+            //Derive a key from the secret and the salt
+            $key = SecretShareCryptography::deriveKey($secretId, $salt);
+
+            // Encrypt the secret
+            $encryptedSecret = SecretShareCryptography::encryptData($secret, $key);
 
             $secretDatabaseId = SecretShareCryptography::generateHmac($secretId);
     
@@ -87,20 +96,24 @@ class SecretShareRoutingHandler {
     
             // Format expiration time as MM/DD/YYYY HH:MM:SS in UTC
             $formattedExpirationTime = gmdate('m/d/Y H:i:s', $expirationTime);
-    
+
+            //Serialize the storage array for storage in the database
+            $secretData = SecretShareParser::prepareStorageArray($encryptedSecret, $salt, PBKDF2_ITERATIONS);
+            
             // Store the secret in the database
             $database = new SecretShareDatabase();
-            $database->addSecret($secretDatabaseId, $expirationTime, $maxViews, 0, $encryptedSecret);
+            $database->addSecret($secretDatabaseId, $expirationTime, $maxViews, 0, $secretData);
     
             // Respond with success message
             echo json_encode([
                 'success' => true,
                 'secret_id' => $secretId,
-                'expiration_time' => $formattedExpirationTime . " GMT"
+                'expiration_time' => $formattedExpirationTime . " GMT",
             ]);
         } catch (Exception $e) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            
         }
     }
 
@@ -117,9 +130,12 @@ class SecretShareRoutingHandler {
             $database = new SecretShareDatabase();
             $databaseId = SecretShareCryptography::generateHmac($secretId);
             $secret = $database->fetchSecret($databaseId);
-    
+            // Parse secret storage array
+            $parsedSecret = SecretShareParser::parseStorageArray($secret['secret_value']);
+            // Derive key from secret ID and salt
+            $key = SecretShareCryptography::deriveKey($secretId, $parsedSecret['ss'], $parsedSecret['si']);   
             // Decrypt secret
-            $decryptedSecret = SecretShareCryptography::decryptData($secret['secret_value']);
+            $decryptedSecret = SecretShareCryptography::decryptData($parsedSecret['sd'], $key);
     
             // Respond with decrypted secret
             echo json_encode([

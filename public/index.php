@@ -13,6 +13,16 @@ require_once("../Backend/SecretShareDatabase.php");
 require_once("../Backend/SecretShareCryptography.php");
 require_once("../Backend/SecretShareSession.php");
 require_once("../Backend/SecretShareRoutingHandler.php");
+//Fill for PBKDF2_ITERATIONS if not defined in _config.php
+if(!defined('PBKDF2_ITERATIONS')) {
+    define('PBKDF2_ITERATIONS', 100000);
+}
+
+//Fill for MAXIMUM_VIEWS if not defined in _config.php
+if(!defined('MAXIMUM_VIEWS')) {
+    define('MAXIMUM_VIEWS', 5);
+}
+
 session_start();
 $CSRF_TOKEN = SecretShareSession::initiateCsrfToken();
 
