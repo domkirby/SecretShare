@@ -2,16 +2,20 @@
 
 class SecretShareCryptography
 {
-    public static function encryptData(string $data): string
+    public static function encryptData(string $data, string $key = ''): string
     {
         $ivLength = openssl_cipher_iv_length('aes-256-gcm');
-        $iv = openssl_random_pseudo_bytes($ivLength);
+        $iv = random_bytes($ivLength); 
         $tag = '';
+
+        if($key === '') {
+            throw new Exception('Encryption key is required.');
+        }
 
         $ciphertext = openssl_encrypt(
             $data,
             'aes-256-gcm',
-            SERVER_SIDE_ENCRYPTION_KEY,
+            $key,
             OPENSSL_RAW_DATA,
             $iv,
             $tag
@@ -25,9 +29,23 @@ class SecretShareCryptography
         return base64_encode($iv) . '::' . base64_encode($tag) . '::' . base64_encode($ciphertext);
     }
 
-    public static function decryptData(string $encryptedData): string
+    public static function decryptData(string $encryptedData, string $key = ''): string
     {
         $parts = explode('::', $encryptedData);
+
+        if($key === '') {
+            $key = SERVER_SIDE_ENCRYPTION_KEY;
+        } 
+
+        if (ctype_xdigit($key) && strlen($key) === 64) {
+            // Convert hex to binary if needed
+            $key = hex2bin($key);
+        }
+
+        $keyBits = strlen($key) * 8;
+        if ($keyBits !== 256) {
+            throw new Exception("[Server]: Invalid key length: {$keyBits} bits. Key must be 256 bits for AES-256-GCM.");
+        }
 
         if (count($parts) !== 3) {
             throw new Exception('Invalid encrypted data format.');
@@ -37,20 +55,38 @@ class SecretShareCryptography
         $tag = base64_decode($parts[1]);
         $ciphertext = base64_decode($parts[2]);
 
+        if (strlen($iv) !== 12) {
+            throw new Exception("[Server]: Invalid IV length: " . strlen($iv) . " bytes ( ". bin2hex($iv) ." ). Expected 12 bytes.");
+        }
+
         $plaintext = openssl_decrypt(
             $ciphertext,
             'aes-256-gcm',
-            SERVER_SIDE_ENCRYPTION_KEY,
+            $key,
             OPENSSL_RAW_DATA,
             $iv,
             $tag
         );
-
+        
         if ($plaintext === false) {
-            throw new Exception('Decryption failed.');
+            $error = "[Server]: Decryption failed. $keyBits \n";
+            while($msg = openssl_error_string()) {
+                $error .= $msg . "\n";
+            }
+            throw new Exception($error);
         }
 
         return $plaintext;
+    }
+
+    public static function deriveKey(string $password, string $salt, int $iterations = PBKDF2_ITERATIONS): string
+    {
+       return self::customPBKDF2('sha256', $password, $salt, $iterations, 32);
+    }
+
+    public static function generateSalt(): string
+    {
+        return random_bytes(16);
     }
 
     public static function generateUniqueId(): string
@@ -75,6 +111,28 @@ class SecretShareCryptography
     public static function base64UrlDecode(string $data): string
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+    }
+
+    //Dealing with some sort of PHP bug required us to build a custom PBKDF2 function. We'll go back to hash_pbkdf2() when it's fixed.
+    private static function customPBKDF2(string $algo, string $password, string $salt, int $iterations, int $length): string
+    {
+        $hashLen = strlen(hash($algo, '', true)); // Get native hash length
+        $blocks = ceil($length / $hashLen);
+    
+        $derivedKey = '';
+        for ($i = 1; $i <= $blocks; $i++) {
+            $block = $salt . pack('N', $i);
+            $blockHash = $blockIntermediate = hash_hmac($algo, $block, $password, true);
+    
+            for ($j = 1; $j < $iterations; $j++) {
+                $blockIntermediate = hash_hmac($algo, $blockIntermediate, $password, true);
+                $blockHash ^= $blockIntermediate; // XOR each iteration
+            }
+    
+            $derivedKey .= $blockHash;
+        }
+    
+        return substr($derivedKey, 0, $length);
     }
 }
 

@@ -26,6 +26,29 @@ class SecretShareParser
 
         return time() + $additionalSeconds;
     }
+
+    public static function prepareStorageArray(string $data, string $salt, int $iterations)
+    {
+        $salt = bin2hex($salt);
+        $storageArray = [
+            'sd' => $data,
+            'ss' => $salt,
+            'si' => $iterations
+        ];
+
+        return json_encode($storageArray);
+    }
+
+    public static function parseStorageArray(string $storageArray): array
+    {
+        $parsedArray = json_decode($storageArray, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception('Failed to parse storage array: ' . json_last_error_msg());
+        }
+        $parsedArray['ss'] = hex2bin($parsedArray['ss']);
+        return $parsedArray;
+    }
 }
 
 ?>
