@@ -7,7 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-dark.min.css" rel="stylesheet" crossorigin="anonymous" media="(prefers-color-scheme: dark)">
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/main.css?v=<?php echo CURRENT_VERSION; ?>">
 </head>
 <body>
 
@@ -56,8 +57,11 @@
                 </div>
                 <div class="mb-3" id="customPasswordDiv" style="display: none;">
                     <label for="customPassword" class="form-label">Custom Password:</label>
-                    <input type="password" id="customPassword" class="form-control" disabled>
-                    <div class="form-text">This password will be required to view the secret.</div>
+                    <div class="input-group">
+                        <input type="password" id="customPassword" class="form-control" minlength="8" disabled>
+                        <button class="btn btn-outline-success" id="togglePassword" alt="Toggle Password Field Visibility" data-bs-toggle="tooltip" data-bs-title="Toggle password visibility"><i class="bi bi-eye-slash" id="togglePasswordInnerContent"></i></button>
+                    </div>
+                    <div class="form-text">This password will be required to view the secret. <strong>Strength:</strong> <span id="passwordStrength">None</span></div>
                     <div class="alert alert-warning form-text"><strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password. If you lose this password, it will be impossible to view the contents of the secret.</div>
                 </div>
                 <div class="mb-3">
@@ -69,7 +73,7 @@
                 </div>
             </form>
             <div class="mb-3 text-end">
-                <a href="/about" class="btn btn-outline-primary btn-sm">About This Tool</a>
+                <a href="/about" class="btn btn-outline-info btn-sm">About This Tool</a>
             </div>
         </div>
         <div class="container-sm inner-content-container" id="secretLinkContainer" style="display: none;">
@@ -85,10 +89,7 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="js/encryption.js"></script>
-    <script>
-        const csrfToken = "<?php echo $this->CSRF_TOKEN; ?>";
-    </script>
-    <script src="js/home.js"></script>
+    <script src="js/encryption.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <script src="js/home.js?v=<?php echo CURRENT_VERSION; ?>"></script>
 </body>
 </html>

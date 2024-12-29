@@ -7,6 +7,7 @@ if(! file_exists("../_config.php")) {
 }
 
 require_once("../_config.php");
+require("../_versioninfo.php");
 require_once("../vendor/autoload.php");
 require_once("../Backend/SecretShareParser.php");
 require_once("../Backend/SecretShareDatabase.php");
@@ -32,7 +33,11 @@ $router = new Router;
 
 $router->get('/', function() {
     global $HANDLER;
-    $HANDLER->home();
+    if(INSTALLED) {
+        $HANDLER->home();
+    } else {
+        $HANDLER->notInstalled();
+    }
 });
 
 $router->get('/about', function() {
@@ -57,8 +62,7 @@ $router->get('/cron/{secret}', function($secret) {
     if($secret === CRON_SECRET) {
         $HANDLER->deleteExpiredSecretsCron();
     } else {
-        http_response_code(404);
-        exit();
+        $HANDLER->notFound();
     }
 });
 
@@ -80,12 +84,12 @@ $router->post('/api/deleteSecret/{secretId}', function($secretId) {
 
 //installer route
 $router->get('/install', function() {
+    global $HANDLER;
     if(! INSTALLED) {
-        global $HANDLER;
         $HANDLER->install();
     } else {
-        http_response_code(404);
-        exit();
+        $HANDLER->notFound();
+        
     }
     
 });
@@ -99,12 +103,17 @@ $router->post('/install', function() {
             echo "Installation complete. Please set INSTALLED to true in _config.php.";
             exit();
         } catch(Exception $e) {
-            header("Location: /install?error=" . $e->getMessage());
+            header("Location: /install?error=" . urlencode($e->getMessage()));
         }
     } else {
-        http_response_code(404);
-        exit();
+        global $HANDLER;
+        $HANDLER->notFound();
     }
+});
+
+$router->set404(function() {
+    global $HANDLER;
+    $HANDLER->notFound();
 });
 
 $router->run();
