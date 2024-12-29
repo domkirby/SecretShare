@@ -7,7 +7,9 @@ $(document).ready(function() {
     const passwordCheckbox = $("#useCustomPassword");
     const passwordInput = $("#customPassword");
     const customPasswordDiv = $("#customPasswordDiv");
-
+    const togglePasswordButton = document.querySelector("#togglePassword");
+    const togglePasswordInnerContent = document.querySelector("#togglePasswordInnerContent");
+    const pwFieldQuery = document.querySelector("#customPassword");
     passwordCheckbox.on("change", function() {
         console.log("Checkbox changed");
         if(passwordCheckbox.is(":checked")) {
@@ -16,10 +18,28 @@ $(document).ready(function() {
             passwordInput.attr('disabled', false);
         } else {
             customPasswordDiv.hide();
+            passwordInput.val('');
             passwordInput.attr("required", false);
             passwordInput.attr('disabled', true);
         }
     });
+
+    passwordInput.on("input", function() {  
+        const password = passwordInput.val();
+        const strength = checkPasswordStrength(password);
+        const strengthText = $("#passwordStrength");
+        strengthText.text(strength);
+    });
+
+    togglePasswordButton.addEventListener("click", function(e) {
+        e.preventDefault();
+        const type = pwFieldQuery.getAttribute("type") === "password" ? "text" : "password";
+        pwFieldQuery.setAttribute("type", type);
+        togglePasswordInnerContent.classList.toggle("bi-eye");
+    });
+
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
     form.on("submit", async function(e) {
         e.preventDefault();
@@ -85,3 +105,43 @@ $(document).ready(function() {
         }
     });
 });
+
+
+function checkPasswordStrength(password) {
+    let strength = 0;
+  
+    // Length check
+    if (password.length >= 8) {
+      strength++;
+    }
+  
+    // Lowercase, uppercase, numbers, special chars
+    if (password.match(/[a-z]/)) {
+      strength++;
+    }
+    if (password.match(/[A-Z]/)) {
+      strength++;
+    }
+    if (password.match(/[0-9]/)) {
+      strength++;
+    }
+    if (password.match(/[^a-zA-Z0-9]/)) {
+      strength++;
+    }
+  
+    // Strength rating
+    switch (strength) {
+      case 0:
+        return "Missing";
+      case 1:
+        return "Useless"
+      case 2:
+        return "Weak";
+      case 3:
+        return "Okay";
+      case 4:
+        return "Better";
+      case 5:
+        return "We'll get a decent key from this (if it's random)!";
+    }
+  }

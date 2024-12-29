@@ -182,6 +182,12 @@ class SecretShareRoutingHandler {
         exit();
     }
 
+    public function notInstalled(): void
+    {
+        require $this->viewDirectory . "notInstalled.php";
+        exit();
+    }
+
 }
 
 ?>
