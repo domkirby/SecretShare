@@ -58,7 +58,7 @@ $(document).ready(async function() {
                 console.error("Error retrieving secret:", xhr.responseJSON);
                 errorMsg = "An error occurred while retrieving the secret. Please refresh try again. If the secret reached maximum views, it was destroyed.";
                 if(xhr.responseJSON.error) {
-                    errorMsg = errorMsg = " (" + xhr.responseJSON.error + ")";
+                    errorMsg = errorMsg + " (" + xhr.responseJSON.error + ")";
                 }
                 $("#errors").text(errorMsg);
                 $("#errors").show();
