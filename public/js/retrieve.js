@@ -54,9 +54,13 @@ $(document).ready(async function() {
                     submitBtn.prop("disabled", true);
                 }
             },
-            error: function(xhr, status, error) {
-                console.error("Error retrieving secret:", error);
-                $("#errors").text("An error occurred while retrieving the secret. Please refresh try again. If the secret reached maximum views, it was destroyed.");
+            error: function(xhr) {
+                console.error("Error retrieving secret:", xhr.responseJSON);
+                errorMsg = "An error occurred while retrieving the secret. Please refresh try again. If the secret reached maximum views, it was destroyed.";
+                if(xhr.responseJSON.error) {
+                    errorMsg = errorMsg = " (" + xhr.responseJSON.error + ")";
+                }
+                $("#errors").text(errorMsg);
                 $("#errors").show();
                 spinner.hide();
                 submitBtn.prop("disabled", true);
