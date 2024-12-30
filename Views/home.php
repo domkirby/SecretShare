@@ -60,6 +60,7 @@
                     <div class="input-group">
                         <input type="password" id="customPassword" class="form-control" minlength="8" disabled>
                         <button class="btn btn-outline-success" id="togglePassword" alt="Toggle Password Field Visibility" data-bs-toggle="tooltip" data-bs-title="Toggle password visibility"><i class="bi bi-eye-slash" id="togglePasswordInnerContent"></i></button>
+                        <button class="btn btn-outline-primary" id="generatePasswordButton" alt="Generate A Password" data-bs-toggle="tooltip" data-bs-title="Generate a password"><i class="bi bi-arrow-clockwise"></i></button>
                     </div>
                     <div class="form-text">This password will be required to view the secret. <strong>Strength:</strong> <span id="passwordStrength">None</span></div>
                     <div class="alert alert-warning form-text"><strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password. If you lose this password, it will be impossible to view the contents of the secret.</div>

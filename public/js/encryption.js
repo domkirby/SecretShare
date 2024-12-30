@@ -121,3 +121,22 @@ async function generatePBKDF2Key(password, saltLength = 16, iterations = 350000,
         saltLength: salt.length
     };
 }
+
+async function generateSecurePassword(length = 16) {
+    if (length <= 8) {
+        throw new Error("Password length must be greater than 8");
+    }
+
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:<>,.?/";
+    const charsetLength = charset.length;
+
+    // Generate an array of random numbers
+    const randomValues = new Uint8Array(length);
+    crypto.getRandomValues(randomValues);
+
+    // Map random numbers to characters in the charset
+    const passwordArray = Array.from(randomValues, (value) => charset[value % charsetLength]);
+
+    // Combine into a single string
+    return passwordArray.join("");
+}

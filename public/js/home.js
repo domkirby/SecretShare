@@ -10,6 +10,7 @@ $(document).ready(function() {
     const togglePasswordButton = document.querySelector("#togglePassword");
     const togglePasswordInnerContent = document.querySelector("#togglePasswordInnerContent");
     const pwFieldQuery = document.querySelector("#customPassword");
+    const generatePasswordButton = $("#generatePasswordButton");
     passwordCheckbox.on("change", function() {
         console.log("Checkbox changed");
         if(passwordCheckbox.is(":checked")) {
@@ -36,6 +37,16 @@ $(document).ready(function() {
         const type = pwFieldQuery.getAttribute("type") === "password" ? "text" : "password";
         pwFieldQuery.setAttribute("type", type);
         togglePasswordInnerContent.classList.toggle("bi-eye");
+    });
+    generatePasswordButton.on("click", async function(e) {
+        e.preventDefault();
+        const password = await generateSecurePassword(16);
+        passwordInput.val(password);
+        passwordInput.trigger("input");
+        if(pwFieldQuery.getAttribute("type") === "password") {
+            pwFieldQuery.setAttribute("type", "text");
+            togglePasswordInnerContent.classList.toggle("bi-eye");
+        }
     });
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
