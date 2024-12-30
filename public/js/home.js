@@ -145,14 +145,14 @@ function checkPasswordStrength(password) {
       case 0:
         return "Missing";
       case 1:
-        return "Useless"
+        return "Not great";
       case 2:
         return "Weak";
       case 3:
         return "Okay";
       case 4:
-        return "Better";
+        return "Good (if it's random)";
       case 5:
-        return "We'll get a decent key from this (if it's random)!";
+        return "Great (if it's random)!";
     }
   }
