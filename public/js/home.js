@@ -10,6 +10,7 @@ $(document).ready(function() {
     const togglePasswordButton = document.querySelector("#togglePassword");
     const togglePasswordInnerContent = document.querySelector("#togglePasswordInnerContent");
     const pwFieldQuery = document.querySelector("#customPassword");
+    const generatePasswordButton = $("#generatePasswordButton");
     passwordCheckbox.on("change", function() {
         console.log("Checkbox changed");
         if(passwordCheckbox.is(":checked")) {
@@ -36,6 +37,16 @@ $(document).ready(function() {
         const type = pwFieldQuery.getAttribute("type") === "password" ? "text" : "password";
         pwFieldQuery.setAttribute("type", type);
         togglePasswordInnerContent.classList.toggle("bi-eye");
+    });
+    generatePasswordButton.on("click", async function(e) {
+        e.preventDefault();
+        const password = await generateSecurePassword(16);
+        passwordInput.val(password);
+        passwordInput.trigger("input");
+        if(pwFieldQuery.getAttribute("type") === "password") {
+            pwFieldQuery.setAttribute("type", "text");
+            togglePasswordInnerContent.classList.toggle("bi-eye");
+        }
     });
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -134,14 +145,14 @@ function checkPasswordStrength(password) {
       case 0:
         return "Missing";
       case 1:
-        return "Useless"
+        return "Not great";
       case 2:
         return "Weak";
       case 3:
         return "Okay";
       case 4:
-        return "Better";
+        return "Good (if it's random)";
       case 5:
-        return "We'll get a decent key from this (if it's random)!";
+        return "Great (if it's random)!";
     }
   }

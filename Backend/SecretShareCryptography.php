@@ -97,6 +97,9 @@ class SecretShareCryptography
 
     public static function generateHmac(string $data): string
     {
+        if(!defined('SERVER_SIDE_HMAC_SECRET') || SERVER_SIDE_HMAC_SECRET === '' || SERVER_SIDE_HMAC_SECRET === 'RANDOM_HMAC_SECRET') {
+            throw new Exception('[CONFIG ERROR]: Server-side HMAC secret is not defined or has not been randomized. Check _config.php');
+        }
         $hmac = hash_hmac('sha256', $data, SERVER_SIDE_HMAC_SECRET, true);
         return self::base64UrlEncode($hmac);
     }
