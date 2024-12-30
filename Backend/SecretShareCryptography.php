@@ -91,10 +91,8 @@ class SecretShareCryptography
 
     public static function generateUniqueId(): string
     {
-        $randomBytes = random_bytes(16); //Random bytes are used to ensure the uniqueness and sufficient randomness (128 bits) of the ID
-        $uniqid = uniqid('', true); //Uniqid is used to ensure we do not have collisions
-        $hash = hash('sha256', $uniqid . $randomBytes, true); //hash these together
-        return self::base64UrlEncode($hash); //base64 encode the hash (URL Safe)
+        $randomBytes = random_bytes(32); // Generate 32 random bytes (256 bits), extremely unlikely to collide and virtually impossible to guess
+        return self::base64UrlEncode($randomBytes); //base64 encode the bits in URL-safe format
     }
 
     public static function generateHmac(string $data): string
