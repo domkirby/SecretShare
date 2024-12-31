@@ -41,7 +41,12 @@ $(document).ready(function() {
     });
     generatePasswordButton.on("click", async function(e) {
         e.preventDefault();
-        const password = await generateSecurePassword(16);
+        password = '';
+        if(useDicewareForPasswordGeneration) {
+          password = await generateDicewarePassphrase();
+        } else {
+          password = await generateSecurePassword(16);
+        }
         passwordInput.val(password);
         passwordInput.trigger("input");
         if(pwFieldQuery.getAttribute("type") === "password") {

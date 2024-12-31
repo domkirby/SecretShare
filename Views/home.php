@@ -92,6 +92,9 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="js/encryption.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <script>
+        const useDicewareForPasswordGeneration = <?php echo USE_DICEWARE_PASSWORD_GENERATOR ? 'true' : 'false'; ?>;
+    </script>
     <script src="js/home.js?v=<?php echo CURRENT_VERSION; ?>"></script>
 </body>
 </html>

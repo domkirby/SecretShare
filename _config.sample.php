@@ -60,5 +60,8 @@
 //This value appears on the view secret page and explains the tool to the user.
  define('UI_RETRIEVE_EXPLAINER', 'You have received a secret from our SecretShare service. To view the secret, click the button below. Once you view the secret, a view will be counted towards the maximum views.');
 
+//Whether or not Diceware should be used on the custom password generator
+define('USE_DICEWARE_PASSWORD_GENERATOR', true);
+
 //Installed: Set this to true once you have completed the /install portion (e.g. created the database tables).
 define('INSTALLED', false);
