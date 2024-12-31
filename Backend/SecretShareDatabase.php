@@ -80,6 +80,7 @@ class SecretShareDatabase
     // Fetch a secret by secret_id and manage view count
     public function fetchSecret(string $secretId): array
     {
+        $wasDeleted = false;
         $query = "SELECT * FROM secrets WHERE secret_id = ?";
 
         $stmt = $this->connection->prepare($query);
@@ -109,6 +110,7 @@ class SecretShareDatabase
 
         if ($secret['current_views'] >= $secret['max_views']) {
             $this->deleteSecret($secretId);
+            $wasDeleted = true;
         } else {
             $updateQuery = "UPDATE secrets SET current_views = ? WHERE secret_id = ?";
 
@@ -127,7 +129,12 @@ class SecretShareDatabase
             $updateStmt->close();
         }
 
-        return $secret;
+        $ret = [
+            'secret' => $secret,
+            'wasDeleted' => $wasDeleted
+        ];
+
+        return $ret;
     }
 
     // Check if a secret exists by secret_id

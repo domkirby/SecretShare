@@ -131,7 +131,7 @@ class SecretShareRoutingHandler {
             $databaseId = SecretShareCryptography::generateHmac($secretId);
             $secret = $database->fetchSecret($databaseId);
             // Parse secret storage array
-            $parsedSecret = SecretShareParser::parseStorageArray($secret['secret_value']);
+            $parsedSecret = SecretShareParser::parseStorageArray($secret['secret']['secret_value']);
             // Derive key from secret ID and salt
             $key = SecretShareCryptography::deriveKey($secretId, $parsedSecret['ss'], $parsedSecret['si']);   
             // Decrypt secret
@@ -140,7 +140,8 @@ class SecretShareRoutingHandler {
             // Respond with decrypted secret
             echo json_encode([
                 'success' => true,
-                'secret' => $decryptedSecret
+                'secret' => $decryptedSecret,
+                'deleted' => $secret['wasDeleted'],
             ]);
         } catch (Exception $e) {
             http_response_code(400);
