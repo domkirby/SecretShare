@@ -11,6 +11,7 @@ $(document).ready(function() {
     const togglePasswordInnerContent = document.querySelector("#togglePasswordInnerContent");
     const pwFieldQuery = document.querySelector("#customPassword");
     const generatePasswordButton = $("#generatePasswordButton");
+    const shareButton = $("#shareLink");
     passwordCheckbox.on("change", function() {
         console.log("Checkbox changed");
         if(passwordCheckbox.is(":checked")) {
@@ -100,6 +101,20 @@ $(document).ready(function() {
                         $("#copyLink").on("click", function() {
                             navigator.clipboard.writeText(secretUrl);
                             $("#copyLink").text("Copied!");
+                        });
+
+                        const navigatorShareData = {
+                          title: "Secure data is being shared with you",
+                          text: "This one-time secret is being shared with you. Click the link to view the secret.",
+                          url: secretUrl
+                        };
+                        shareButton.on("click", function() {
+                          if(navigator.share) {
+                            navigator.share(navigatorShareData);
+                          } else {
+                            alert('Your browser does not support this sharing method, please copy the link manually.');
+                            console.error("Web Share API not supported");
+                          }
                         });
                     },
                     error: function($xhr) {

@@ -85,6 +85,7 @@
                 <div class="input-group">
                     <input type="text" id="secretLink" class="form-control" readonly>
                     <button class="btn btn-outline-success" id="copyLink">Copy</button>
+                    <button class="btn btn-outline-primary" id="shareLink" data-bs-title="Share Link" data-bs-toggle="tooltip"><i class="bi bi-share-fill"></i></button>
                 </div>
             </div>
         </div>

@@ -46,6 +46,10 @@ $(document).ready(async function() {
                         navigator.clipboard.writeText(decryptedData);
                         $("#copySecretButton").text("Copied!");
                     });
+                    if(data.deleted) {
+                        $("#deleteSecretBtn").hide();
+                        $("#secretDeleted").show();
+                    }
                 } catch (error) {
                     console.error("Error decrypting data:", error);
                     $("#errors").text("An error occurred while decrypting the data. Please refresh and try again. If the secret reached maximum views, it was destroyed.");
