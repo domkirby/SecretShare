@@ -24,6 +24,11 @@ if(!defined('MAXIMUM_VIEWS')) {
     define('MAXIMUM_VIEWS', 5);
 }
 
+//Fill for USE_DICEWARE_PASSWORD_GENERATOR if not defined in _config.php
+if(!defined('USE_DICEWARE_PASSWORD_GENERATOR')) {
+    define('USE_DICEWARE_PASSWORD_GENERATOR', true);
+}
+
 session_start();
 $CSRF_TOKEN = SecretShareSession::initiateCsrfToken();
 
