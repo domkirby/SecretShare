@@ -28,10 +28,17 @@ if(!defined('MAXIMUM_VIEWS')) {
 if(!defined('USE_DICEWARE_PASSWORD_GENERATOR')) {
     define('USE_DICEWARE_PASSWORD_GENERATOR', true);
 }
-
+//Start the session with secure cookie settings
+if($_SERVER['HTTP_HOST'] === 'localhost') {
+    ini_set('session.cookie_secure', '0');
+} else {
+    ini_set('session.cookie_secure', '1');
+}
+ini_set('session.cookie_httponly', '1');
+ini_set('session.use_strict_mode', '1');
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 $CSRF_TOKEN = SecretShareSession::initiateCsrfToken();
-
 $HANDLER = new SecretShareRoutingHandler($CSRF_TOKEN);
 
 $router = new Router;
