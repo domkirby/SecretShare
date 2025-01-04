@@ -28,6 +28,12 @@ class SecretShareRoutingHandler {
         exit();
     }
 
+    public function pwgen(): void
+    {
+        require $this->viewDirectory . "pwgen.php";
+        exit();
+    }
+
     public function notFound(): void
     {
         http_response_code(404);
