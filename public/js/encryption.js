@@ -148,8 +148,9 @@ async function generateSecurePassword(length = 16) {
 }
 
 
-// Function to generate a Diceware passphrase with random separators and a random 3-digit number
-async function generateDicewarePassphrase(numWords = 6) {
+// Function to generate a Diceware passphrase with random separators and a random 3-digit number 
+// 3.4.0: Adds backward compatible options.
+async function generateDicewarePassphrase(numWords = 6, options = { addSeparators: true, addNumber: true }) {
     if (numWords <= 0) {
         throw new Error("The number of words must be greater than 0.");
     }
@@ -180,15 +181,10 @@ async function generateDicewarePassphrase(numWords = 6) {
     crypto.getRandomValues(randomWordIndices);
     crypto.getRandomValues(randomSeparatorIndices);
 
-    // Select words and separators
+    // Select words
     const passphraseWords = Array.from(randomWordIndices, (value) => {
         const index = value % wordlistLength;
         return wordlist[index];
-    });
-
-    const separatorsArray = Array.from(randomSeparatorIndices, (value) => {
-        const index = value % separatorLength;
-        return separators[index];
     });
 
     // Randomly capitalize at least one word
@@ -198,15 +194,29 @@ async function generateDicewarePassphrase(numWords = 6) {
     };
     capitalizeRandomWord();
 
-    // Combine words with random separators
-    let passphrase = passphraseWords[0];
-    for (let i = 0; i < separatorsArray.length; i++) {
-        passphrase += separatorsArray[i] + passphraseWords[i + 1];
+    // Assemble the passphrase
+    let passphrase;
+    if (options.addSeparators) {
+        // Select separators
+        const separatorsArray = Array.from(randomSeparatorIndices, (value) => {
+            const index = value % separatorLength;
+            return separators[index];
+        });
+
+        passphrase = passphraseWords[0];
+        for (let i = 0; i < separatorsArray.length; i++) {
+            passphrase += separatorsArray[i] + passphraseWords[i + 1];
+        }
+    } else {
+        // Use spaces as separators
+        passphrase = passphraseWords.join(" ");
     }
 
-    // Add a random 3-digit number at the end
-    const randomThreeDigitNumber = Math.floor(100 + Math.random() * 900); // Range: 100–999
-    passphrase += randomThreeDigitNumber;
+    // Add a random 3-digit number at the end if required
+    if (options.addNumber) {
+        const randomThreeDigitNumber = Math.floor(100 + Math.random() * 900); // Range: 100–999
+        passphrase += randomThreeDigitNumber;
+    }
 
     return passphrase;
 }

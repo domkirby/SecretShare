@@ -61,6 +61,11 @@ $router->get('/secret/{secretId}', function($secretId) {
     }
 });
 
+$router->get('/password-generator', function() {
+    global $HANDLER;
+    $HANDLER->pwgen();
+});
+
 //HTTP Cron
 $router->get('/cron/{secret}', function($secret) {
     global $HANDLER;
