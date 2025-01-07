@@ -13,7 +13,19 @@ require_once("../Backend/SecretShareParser.php");
 require_once("../Backend/SecretShareDatabase.php");
 require_once("../Backend/SecretShareCryptography.php");
 require_once("../Backend/SecretShareSession.php");
+require_once("../Backend/SecretShareTurnstile.php");
 require_once("../Backend/SecretShareRoutingHandler.php");
+
+if(!defined('CLOUDFLARE_TURNSTILE_ENABLED')) {
+    define('CLOUDFLARE_TURNSTILE_ENABLED', false);
+}
+
+if(CLOUDFLARE_TURNSTILE_ENABLED) {
+    if(!defined('CLOUDFLARE_TURNSTILE_SECRET_KEY') || !defined('CLOUDFLARE_TURNSTILE_SITE_KEY') || CLOUDFLARE_TURNSTILE_SECRET_KEY === '' || CLOUDFLARE_TURNSTILE_SITE_KEY === '') {
+        die("Cloudflare Turnstile is enabled, but the secret and site keys are not defined.");
+    }
+}
+
 //Fill for PBKDF2_ITERATIONS if not defined in _config.php
 if(!defined('PBKDF2_ITERATIONS')) {
     define('PBKDF2_ITERATIONS', 100000);

@@ -63,5 +63,10 @@
 //Whether or not Diceware should be used on the custom password generator
 define('USE_DICEWARE_PASSWORD_GENERATOR', true);
 
+//Cloudflare Turnstile (added in 3.5.0, optional)
+define('CLOUDFLARE_TURNSTILE_ENABLED', false); //Set this to true to enable the Cloudflare Turnstile. This will require the user to complete a CAPTCHA before viewing the secret.
+define('CLOUDFLARE_TURNSTILE_SECRET_KEY', ''); //The secret key for the Cloudflare Turnstile
+define('CLOUDFLARE_TURNSTILE_SITE_KEY', ''); //The site key for the Cloudflare Turnstile
+
 //Installed: Set this to true once you have completed the /install portion (e.g. created the database tables).
 define('INSTALLED', false);

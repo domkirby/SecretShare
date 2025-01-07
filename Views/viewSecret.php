@@ -23,11 +23,21 @@
                     <input type="password" id="password" class="form-control" required disabled>
                     <div class="form-text">This password was provided when the secret was created. If you do not have the password, you will not be able to retrieve the secret.</div>
                 </div>
+                <?php if(CLOUDFLARE_TURNSTILE_ENABLED) { ?>
+                    <div class="mb-3">
+                    <div
+                        class="cf-turnstile"
+                        data-sitekey="<?php echo CLOUDFLARE_TURNSTILE_SITE_KEY; ?>"
+                        data-callback="turnstileCallback"
+                        ></div>
+                    </div>
+                <?php } ?>
                 <div class="mb-3">
                     <input type="hidden" name="secretId" id="secretId" value="<?php echo $secretId; ?>">
                     <input type="hidden" name="csrfToken" id="csrfToken" value="<?php echo $this->CSRF_TOKEN; ?>">
-                    <button type="submit" class="btn btn-primary btn-lg" id="submitButton">Retrieve Secret</button>
-                    <div class="spinner-border" role="status" id="loading" style="display: none;">
+                    <input type="hidden" name="cf-turnstile-response" id="cfTurnstileResponse" value="">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitButton" <?php if(CLOUDFLARE_TURNSTILE_ENABLED) echo 'disabled'; ?>>Retrieve Secret</button>
+                    <div class="spinner-border" role="status" id="loading" style="<?php if(!CLOUDFLARE_TURNSTILE_ENABLED) echo 'display: none;'; ?>">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
@@ -53,8 +63,11 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/encryption.js?v=<?php echo CURRENT_VERSION; ?>"></script>
     <script>
-        const csrfToken = "<?php echo $this->CSRF_TOKEN; ?>";
     </script>
+
     <script src="/js/retrieve.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <?php if(CLOUDFLARE_TURNSTILE_ENABLED) { ?>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+    <?php } ?>
 </body>
 </html>

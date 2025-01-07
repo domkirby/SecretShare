@@ -13,7 +13,8 @@ $(document).ready(async function() {
         submitBtn.prop("disabled", true);
         var secretId = $("#secretId").val();
         var payload = {
-            token: $("#csrfToken").val()
+            token: $("#csrfToken").val(),
+            'cf-turnstile-response' : $("#cfTurnstileResponse").val()
         };
         $.ajax({
             method: "POST",
@@ -114,4 +115,12 @@ async function useCustomPassword()
     else {
         return false;
     }
+}
+
+function turnstileCallback(callback)
+{
+    console.log("Turnstile callback");
+    $("#cfTurnstileResponse").val(callback);
+    $("#submitButton").prop("disabled", false);
+    $("#loading").hide();
 }

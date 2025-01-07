@@ -52,6 +52,18 @@ class SecretShareRoutingHandler {
                 http_response_code(403);
                 throw new Exception('CSRF violation detected. Please refresh the page and try again.');
             }
+            if(CLOUDFLARE_TURNSTILE_ENABLED) {
+                if(!isset($_POST['cf-turnstile-response'])) {
+                    throw new Exception('CAPTCHA response is required.');
+                }
+                $response = $_POST['cf-turnstile-response'] ?? '';
+                if(empty($response)) {
+                    throw new Exception('CAPTCHA response is required.');
+                }
+                if(!SecretShareTurnstile::checkTurnstileResponse($response)) {
+                    throw new Exception('CAPTCHA failed.');
+                }
+            }
     
             // Retrieve POST parameters
             $secret = $_POST['secret'] ?? '';
@@ -131,6 +143,18 @@ class SecretShareRoutingHandler {
             if (empty($token) || !isset($_SESSION['token']) || $token !== $_SESSION['token']) {
                 http_response_code(403);
                 throw new Exception('CSRF violation detected. Please refresh the page and try again.');
+            }
+            if(CLOUDFLARE_TURNSTILE_ENABLED) {
+                if(!isset($_POST['cf-turnstile-response'])) {
+                    throw new Exception('CAPTCHA response is required.');
+                }
+                $response = $_POST['cf-turnstile-response'] ?? '';
+                if(empty($response)) {
+                    throw new Exception('CAPTCHA response is required.');
+                }
+                if(!SecretShareTurnstile::checkTurnstileResponse($response)) {
+                    throw new Exception('CAPTCHA failed.');
+                }
             }
             // Retrieve secret from database
             $database = new SecretShareDatabase();

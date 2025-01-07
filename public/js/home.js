@@ -176,3 +176,7 @@ function checkPasswordStrength(password) {
         return "Great (if it's random)!";
     }
   }
+
+  function turnstileCallback(callback) {
+    $("#submitButton").prop("disabled", false);
+  }
