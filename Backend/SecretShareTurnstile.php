@@ -5,10 +5,9 @@ class SecretShareTurnstile {
     private const TURNSTILE_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
     public static function checkTurnstileResponse(string $response) : bool {
-        if(!defined('CLOUDFLARE_TURNSTILE_SECRET_KEY')) {
-            throw new Exception('CLOUDFLARE_TURNSTILE_SECRET_KEY is not defined');
+        if(!defined('CLOUDFLARE_TURNSTILE_SECRET_KEY') || CLOUDFLARE_TURNSTILE_SECRET_KEY === '') {
+            throw new Exception('CLOUDFLARE_TURNSTILE_SECRET_KEY is not defined or is empty.');
         }
-        return true;
 
         $payload = [
             'secret' => CLOUDFLARE_TURNSTILE_SECRET_KEY,
