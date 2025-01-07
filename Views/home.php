@@ -64,9 +64,18 @@
                     <div class="form-text">This password will be required to view the secret. <strong>Strength:</strong> <span id="passwordStrength">None</span></div>
                     <div class="alert alert-warning form-text"><strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password. If you lose this password, it will be impossible to view the contents of the secret.</div>
                 </div>
+                <?php if(CLOUDFLARE_TURNSTILE_ENABLED) { ?>
+                <div class="mb-3">
+                        <div
+                        class="cf-turnstile"
+                        data-sitekey="<?php echo CLOUDFLARE_TURNSTILE_SITE_KEY; ?>"
+                        data-callback="turnstileCallback"
+                        ></div>
+                </div>
+                <?php } ?>
                 <div class="mb-3">
                     <input type="hidden" name="token" value="<?php echo $this->CSRF_TOKEN; ?>">
-                    <button type="submit" class="btn btn-primary" id="submitButton">Save Secret</button>
+                    <button type="submit" class="btn btn-primary" id="submitButton" <?php if(CLOUDFLARE_TURNSTILE_ENABLED) echo 'disabled'; ?>>Save Secret</button>
                     <div class="spinner-border" role="status" id="loading" style="display: none;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -98,6 +107,10 @@
     <script>
         const useDicewareForPasswordGeneration = <?php echo USE_DICEWARE_PASSWORD_GENERATOR ? 'true' : 'false'; ?>;
     </script>
+
     <script src="js/home.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <?php if(CLOUDFLARE_TURNSTILE_ENABLED) { ?>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+    <?php } ?>
 </body>
 </html>
