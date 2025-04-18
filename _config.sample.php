@@ -47,6 +47,12 @@
    */
   define('MAXIMUM_VIEWS', 5);
 
+  /**
+   * Maximum size of a secret in bytes.
+   * Helps prevent abuse of the system by limiting the size of the secret.
+   */
+  define('MAXIMUM_SECRET_SIZE_BYTES', 1048576); //1MB
+
 /**
  * UI SETTINGS
  * These settings influence various parts of the UI, primarily messages.
@@ -67,6 +73,7 @@ define('USE_DICEWARE_PASSWORD_GENERATOR', true);
 define('CLOUDFLARE_TURNSTILE_ENABLED', false); //Set this to true to enable the Cloudflare Turnstile. This will require the user to complete a CAPTCHA before viewing the secret.
 define('CLOUDFLARE_TURNSTILE_SECRET_KEY', ''); //The secret key for the Cloudflare Turnstile
 define('CLOUDFLARE_TURNSTILE_SITE_KEY', ''); //The site key for the Cloudflare Turnstile
+
 
 //Installed: Set this to true once you have completed the /install portion (e.g. created the database tables).
 define('INSTALLED', false);
