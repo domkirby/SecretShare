@@ -75,8 +75,8 @@ class SecretShareRoutingHandler {
             if (empty($secret) || $maxViews <= 0 || $expirationPeriod <= 0 || empty($expirationUnit)) {
                 throw new Exception('Invalid input. All fields are required.');
             }
-            if (strlen($secret) > MAXIMUM_SECRET_SIZE_BYTES) {
-                throw new Exception('Secret is too large. Maximum size is ' . MAXIMUM_SECRET_SIZE_BYTES . ' bytes.');
+            if(mb_strlen($secret) > MAXIMUM_SECRET_SIZE) {
+                throw new Exception('Secret is too long. Maximum size is ' . MAXIMUM_SECRET_SIZE . ' characters.');
             }
     
             // Validate expiration unit

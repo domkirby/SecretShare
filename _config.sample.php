@@ -48,10 +48,10 @@
   define('MAXIMUM_VIEWS', 5);
 
   /**
-   * Maximum size of a secret in bytes.
-   * Helps prevent abuse of the system by limiting the size of the secret.
+   * Maximum size of a secret in characters (mb_strlen)
+   * This value sets the maximum size of a secret in characters. This is a security measure to prevent the secret from being too large.
    */
-  define('MAXIMUM_SECRET_SIZE_BYTES', 1048576); //1MB
+  define('MAXIMUM_SECRET_SIZE', 10000); //10,000 characters (10KB)
 
 /**
  * UI SETTINGS

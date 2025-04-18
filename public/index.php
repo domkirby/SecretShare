@@ -40,9 +40,9 @@ if(!defined('MAXIMUM_VIEWS')) {
 if(!defined('USE_DICEWARE_PASSWORD_GENERATOR')) {
     define('USE_DICEWARE_PASSWORD_GENERATOR', true);
 }
-//Fill for MAXIMUM_SECRET_SIZE_BYTES if not defined in _config.php
-if(!defined('MAXIMUM_SECRET_SIZE_BYTES')) {
-    define('MAXIMUM_SECRET_SIZE_BYTES', 1048576); //1MB
+//Fill for MAXIMUM_SECRET_SIZE for max chars
+if(!defined('MAXIMUM_SECRET_SIZE')) {
+    define('MAXIMUM_SECRET_SIZE', 10000); //10,000 characters (10KB)
 }
 //Start the session with secure cookie settings
 if($_SERVER['HTTP_HOST'] === 'localhost') {
