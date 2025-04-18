@@ -34,7 +34,7 @@ class SecretShareCryptography
         $parts = explode('::', $encryptedData);
 
         if($key === '') {
-            $key = SERVER_SIDE_ENCRYPTION_KEY;
+            throw new Exception('Decryption key is required.');
         } 
 
         if (ctype_xdigit($key) && strlen($key) === 64) {
@@ -81,7 +81,8 @@ class SecretShareCryptography
 
     public static function deriveKey(string $password, string $salt, int $iterations = PBKDF2_ITERATIONS): string
     {
-       return self::customPBKDF2('sha256', $password, $salt, $iterations, 32);
+       //return self::customPBKDF2('sha256', $password, $salt, $iterations, 32);
+        return hash_pbkdf2('sha256', $password, $salt, $iterations, 32, true);
     }
 
     public static function generateSalt(): string
@@ -115,9 +116,9 @@ class SecretShareCryptography
     }
 
     //Dealing with some sort of PHP bug required us to build a custom PBKDF2 function. We'll go back to hash_pbkdf2() when it's fixed.
-    private static function customPBKDF2(string $algo, string $password, string $salt, int $iterations, int $length): string
+    private static function customPBKDF2(string $algo, string $password, string $salt, int $iterations, int $length = 32): string
     {
-        $hashLen = strlen(hash($algo, '', true)); // Get native hash length
+        /*$hashLen = strlen(hash($algo, '', true)); // Get native hash length
         $blocks = ceil($length / $hashLen);
     
         $derivedKey = '';
@@ -133,7 +134,8 @@ class SecretShareCryptography
             $derivedKey .= $blockHash;
         }
     
-        return substr($derivedKey, 0, $length);
+        return substr($derivedKey, 0, $length);*/
+        return hash_pbkdf2($algo, $password, $salt, $iterations, $length, true);
     }
 }
 
