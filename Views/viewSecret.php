@@ -12,9 +12,16 @@
 
     <div class="container d-flex align-items-center main-content-container">
         <div class="container-sm inner-content-container" id="retrieveSecretContainer">
-            <h1><?php echo UI_TITLE; ?></h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><?php echo UI_TITLE; ?></h1>
+                <div class="btn-group" role="group" aria-label="Theme">
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="light" data-bs-toggle="tooltip" data-bs-title="Light"><i class="bi bi-sun"></i></button>
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="dark" data-bs-toggle="tooltip" data-bs-title="Dark"><i class="bi bi-moon"></i></button>
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="system" data-bs-toggle="tooltip" data-bs-title="System"><i class="bi bi-circle-half"></i></button>
+                </div>
+            </div>
             <p><?php echo UI_RETRIEVE_EXPLAINER; ?></p>
-            <div class="alert alert-danger" id="errors" style="display: none;">
+            <div class="alert alert-danger" id="errors" style="display: none;" role="alert" aria-live="polite">
 
             </div>
             <form action="#" id="retrieveSecretForm">
@@ -46,10 +53,10 @@
         <div class="container-sm inner-content-container" id="decryptedSecretContainer" style="display: none;">
             <h1>Secret Retrieved!</h1>
             <p>Your secret has been retreived. Please be sure to copy it and store it securely, as it will <strong>not</strong> be permanently stored here.</p>
-            <div class="alert alert-danger" id="errorsTwo" style="display: none;">
+            <div class="alert alert-danger" id="errorsTwo" style="display: none;" role="alert" aria-live="polite">
 
             </div>
-            <div class="alert alert-success" id="secretDeleted" style="display: none;">
+            <div class="alert alert-success" id="secretDeleted" style="display: none;" role="status" aria-live="polite">
                 <p>This secret has been deleted</p>
                 <a href="/" class="btn btn-primary">Create a new secret</a>
             </div>
@@ -62,6 +69,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/encryption.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <!-- Shared UI helpers (toasts, tooltips) -->
+    <script src="/js/ui.js?v=<?php echo CURRENT_VERSION; ?>"></script>
     <script>
     </script>
 

@@ -18,3 +18,116 @@
     font-size: 0.8rem;
     color: #6c757d;
 }
+
+/* Modern theme + dark mode */
+:root {
+  --ss-bg: #f8f9fb;
+  --ss-card-bg: #ffffff;
+  --ss-text: #1f2937;
+  --ss-primary: #6366f1;
+  --ss-primary-600: #4f46e5;
+  --ss-primary-700: #4338ca;
+  --ss-muted: #6b7280;
+  --ss-border: #e5e7eb;
+  --ss-success: #10b981;
+  --ss-danger: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ss-bg: #0b1220;
+    --ss-card-bg: #111827;
+    --ss-text: #e5e7eb;
+    --ss-primary: #8b5cf6;
+    --ss-primary-600: #7c3aed;
+    --ss-primary-700: #6d28d9;
+    --ss-muted: #9ca3af;
+    --ss-border: #1f2937;
+  }
+  body { background: var(--ss-bg); }
+}
+
+/* Explicit theme overrides when JS sets data-theme on <html> */
+:root[data-theme='light'] {
+  --ss-bg: #f8f9fb;
+  --ss-card-bg: #ffffff;
+  --ss-text: #1f2937;
+  --ss-primary: #6366f1;
+  --ss-primary-600: #4f46e5;
+  --ss-primary-700: #4338ca;
+  --ss-muted: #6b7280;
+  --ss-border: #e5e7eb;
+  --ss-success: #10b981;
+  --ss-danger: #ef4444;
+}
+
+:root[data-theme='dark'] {
+  --ss-bg: #0b1220;
+  --ss-card-bg: #111827;
+  --ss-text: #e5e7eb;
+  --ss-primary: #8b5cf6;
+  --ss-primary-600: #7c3aed;
+  --ss-primary-700: #6d28d9;
+  --ss-muted: #9ca3af;
+  --ss-border: #1f2937;
+  --ss-success: #10b981;
+  --ss-danger: #ef4444;
+}
+
+/* Ensure background responds to variable changes */
+html[data-theme='light'] body,
+html[data-theme='dark'] body { background: var(--ss-bg); color: var(--ss-text); }
+
+body {
+  background: var(--ss-bg);
+  color: var(--ss-text);
+}
+
+.inner-content-container {
+  background: var(--ss-card-bg);
+  border: 1px solid var(--ss-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--ss-primary);
+  box-shadow: 0 0 0 .25rem rgba(99,102,241,.25);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--ss-primary), var(--ss-primary-600));
+  border-color: var(--ss-primary-700);
+}
+.btn-primary:hover {
+  background: linear-gradient(180deg, var(--ss-primary-600), var(--ss-primary-700));
+  border-color: var(--ss-primary-700);
+}
+
+/* Optional: visual meter for password strength */
+.progress.strength { height: 8px; background: rgba(0,0,0,.06); }
+.progress-bar.strength-1 { width: 20%; background: #ef4444; }
+.progress-bar.strength-2 { width: 40%; background: #f59e0b; }
+.progress-bar.strength-3 { width: 60%; background: #eab308; }
+.progress-bar.strength-4 { width: 80%; background: #22c55e; }
+.progress-bar.strength-5 { width: 100%; background: #10b981; }
+
+.toast.ss {
+  --bs-toast-bg: var(--ss-card-bg);
+  --bs-toast-color: var(--ss-text);
+  --bs-toast-border-color: var(--ss-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+}
+
+.copy-success { color: var(--ss-success); }
+.error-text { color: var(--ss-danger); }
+/* Ensure help text is readable in both themes */
+.form-text { color: var(--ss-muted) !important; }
+
+/* Dark mode: subtle purple gradient + stronger shadow for main containers */
+html[data-theme='dark'] .inner-content-container {
+  background:
+    linear-gradient(180deg, rgba(139, 92, 246, 0.06), rgba(79, 70, 229, 0.06)),
+    var(--ss-card-bg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 10px rgba(0, 0, 0, 0.35);
+  border-color: rgba(124, 58, 237, 0.25);
+}

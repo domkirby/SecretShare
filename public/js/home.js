@@ -31,6 +31,21 @@ $(document).ready(function() {
         const strength = checkPasswordStrength(password);
         const strengthText = $("#passwordStrength");
         strengthText.text(strength);
+        const $meter = $("#passwordStrengthBar");
+        if ($meter.length) {
+            const map = {
+                "Missing": 1,
+                "Not great": 1,
+                "Weak": 2,
+                "Okay": 3,
+                "Good (if it's random)": 4,
+                "Great (if it's random)!": 5
+            };
+            const n = map[strength] || 1;
+            $meter
+                .removeClass("strength-1 strength-2 strength-3 strength-4 strength-5")
+                .addClass(`strength-${n}`);
+        }
     });
 
     togglePasswordButton.addEventListener("click", function(e) {
@@ -53,6 +68,7 @@ $(document).ready(function() {
             pwFieldQuery.setAttribute("type", "text");
             togglePasswordInnerContent.classList.toggle("bi-eye");
         }
+        if (window.showToast) showToast("A strong password was generated");
     });
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -105,7 +121,22 @@ $(document).ready(function() {
                         $("#createSecretContainer").hide();
                         $("#copyLink").on("click", function() {
                             navigator.clipboard.writeText(secretUrl);
-                            $("#copyLink").text("Copied!");
+                            const $btn = $(this);
+                            $btn.text("Copied!");
+                            if (window.showToast) showToast("Link copied");
+
+                            // Clear any existing revert timer to avoid race conditions on rapid clicks
+                            const existing = $btn.data("resetTimeout");
+                            if (existing) clearTimeout(existing);
+
+                            // Revert back to "Copy" after 3 seconds with a short fade
+                            const timeoutId = setTimeout(function() {
+                                $btn.stop(true, true).fadeOut(150, function() {
+                                    $btn.text("Copy").fadeIn(150);
+                                });
+                                $btn.removeData("resetTimeout");
+                            }, 3000);
+                            $btn.data("resetTimeout", timeoutId);
                         });
 
                         const navigatorShareData = {
