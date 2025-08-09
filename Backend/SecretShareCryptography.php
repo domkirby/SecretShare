@@ -2,15 +2,37 @@
 
 class SecretShareCryptography
 {
+    // Normalize and validate a 256-bit key (accepts 64-hex or 32-byte binary)
+    private static function normalizeKey256(string $key): string
+    {
+        if ($key === '') {
+            throw new Exception('Encryption key is required.');
+        }
+
+        if (ctype_xdigit($key) && strlen($key) === 64) {
+            $bin = hex2bin($key);
+            if ($bin === false) {
+                throw new Exception('Invalid hex key.');
+            }
+            $key = $bin;
+        }
+
+        if (strlen($key) !== 32) {
+            $bits = strlen($key) * 8;
+            throw new Exception("[Server]: Invalid key length: {$bits} bits. Key must be 256 bits for AES-256-GCM.");
+        }
+
+        return $key;
+    }
+
     public static function encryptData(string $data, string $key = ''): string
     {
         $ivLength = openssl_cipher_iv_length('aes-256-gcm');
         $iv = random_bytes($ivLength); 
         $tag = '';
 
-        if($key === '') {
-            throw new Exception('Encryption key is required.');
-        }
+        // Normalize and validate key (hex or binary) -> 32-byte binary
+        $key = self::normalizeKey256($key);
 
         $ciphertext = openssl_encrypt(
             $data,
@@ -18,7 +40,9 @@ class SecretShareCryptography
             $key,
             OPENSSL_RAW_DATA,
             $iv,
-            $tag
+            $tag,
+            '',       // AAD (none)
+            16        // Explicit GCM tag length
         );
 
         if ($ciphertext === false) {
@@ -33,30 +57,27 @@ class SecretShareCryptography
     {
         $parts = explode('::', $encryptedData);
 
-        if($key === '') {
-            throw new Exception('Decryption key is required.');
-        } 
-
-        if (ctype_xdigit($key) && strlen($key) === 64) {
-            // Convert hex to binary if needed
-            $key = hex2bin($key);
-        }
-
-        $keyBits = strlen($key) * 8;
-        if ($keyBits !== 256) {
-            throw new Exception("[Server]: Invalid key length: {$keyBits} bits. Key must be 256 bits for AES-256-GCM.");
-        }
+        // Normalize and validate key (hex or binary) -> 32-byte binary
+        $key = self::normalizeKey256($key);
 
         if (count($parts) !== 3) {
             throw new Exception('Invalid encrypted data format.');
         }
 
-        $iv = base64_decode($parts[0]);
-        $tag = base64_decode($parts[1]);
-        $ciphertext = base64_decode($parts[2]);
+        // Strict Base64 decode for all parts
+        $iv = base64_decode($parts[0], true);
+        $tag = base64_decode($parts[1], true);
+        $ciphertext = base64_decode($parts[2], true);
+
+        if ($iv === false || $tag === false || $ciphertext === false) {
+            throw new Exception('Invalid base64 in encrypted payload.');
+        }
 
         if (strlen($iv) !== 12) {
-            throw new Exception("[Server]: Invalid IV length: " . strlen($iv) . " bytes ( ". bin2hex($iv) ." ). Expected 12 bytes.");
+            throw new Exception("[Server]: Invalid IV length: " . strlen($iv) . " bytes. Expected 12 bytes.");
+        }
+        if (strlen($tag) !== 16) {
+            throw new Exception("[Server]: Invalid GCM tag length: " . strlen($tag) . " bytes. Expected 16 bytes.");
         }
 
         $plaintext = openssl_decrypt(
@@ -69,7 +90,7 @@ class SecretShareCryptography
         );
         
         if ($plaintext === false) {
-            $error = "[Server]: Decryption failed. $keyBits \n";
+            $error = "[Server]: Decryption failed.\n";
             while($msg = openssl_error_string()) {
                 $error .= $msg . "\n";
             }
@@ -112,7 +133,16 @@ class SecretShareCryptography
 
     public static function base64UrlDecode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+        $b64 = strtr($data, '-_', '+/');
+        $pad = strlen($b64) % 4;
+        if ($pad) {
+            $b64 .= str_repeat('=', 4 - $pad);
+        }
+        $decoded = base64_decode($b64, true);
+        if ($decoded === false) {
+            throw new Exception('Invalid base64url input.');
+        }
+        return $decoded;
     }
 
     //Dealing with some sort of PHP bug required us to build a custom PBKDF2 function. We'll go back to hash_pbkdf2() when it's fixed.

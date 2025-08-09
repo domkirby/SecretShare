@@ -1,8 +1,9 @@
 // Function to generate a random 256-bit key using SubtleCrypto
 async function generateRandomKey() {
+    ensureWebCrypto();
     const key = await crypto.subtle.generateKey(
         {
-            name: "AES-GCM",
+            name: "AES-GCM", // fixed typo (was using a non-ASCII M)
             length: 256
         },
         true,
@@ -13,10 +14,47 @@ async function generateRandomKey() {
     return Array.from(new Uint8Array(exportedKey)).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Hexadecimal string
 }
 
+// Helper: ensure WebCrypto in secure context
+function ensureWebCrypto() {
+    if (!window.isSecureContext) {
+        throw new Error("WebCrypto requires a secure context (HTTPS or localhost).");
+    }
+    if (!window.crypto || !window.crypto.subtle) {
+        throw new Error("WebCrypto SubtleCrypto is not available in this environment.");
+    }
+}
+
+// Helper: strict hex-to-bytes with length/format validation for 256-bit keys
+function hexToBytes256(hex) {
+    if (typeof hex !== "string" || !/^[0-9a-fA-F]+$/.test(hex)) {
+        throw new Error("Key must be a hex string.");
+    }
+    if (hex.length !== 64) {
+        throw new Error("Key must be 64 hex characters (256-bit).");
+    }
+    return Uint8Array.from(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+}
+
+// Helper: CSPRNG integer with rejection sampling [min, max)
+function cryptoRandomInt(min, max) {
+    const range = max - min;
+    if (range <= 0) throw new Error("Invalid range for cryptoRandomInt");
+    const uint32Max = 0xFFFFFFFF;
+    const limit = Math.floor((uint32Max + 1) / range) * range;
+    const buf = new Uint32Array(1);
+    let x;
+    do {
+        crypto.getRandomValues(buf);
+        x = buf[0];
+    } while (x >= limit);
+    return min + (x % range);
+}
+
 // Function to encrypt a string using AES-GCM
 async function encryptData(keyHex, plaintext) {
     try {
-        const keyBytes = Uint8Array.from(keyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))); // Convert hex to bytes
+        ensureWebCrypto();
+        const keyBytes = hexToBytes256(keyHex); // Convert hex to bytes with validation
         const key = await crypto.subtle.importKey(
             "raw",
             keyBytes,
@@ -27,7 +65,7 @@ async function encryptData(keyHex, plaintext) {
 
         const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV
         const encoder = new TextEncoder();
-        const plaintextBytes = encoder.encode(plaintext);
+        const plaintextBytes = encoder.encode(String(plaintext));
 
         const ciphertext = await crypto.subtle.encrypt(
             { name: "AES-GCM", iv },
@@ -49,7 +87,8 @@ async function encryptData(keyHex, plaintext) {
 // Function to decrypt a string using AES-GCM
 async function decryptData(keyHex, encryptedData) {
     try {
-        const keyBytes = Uint8Array.from(keyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))); // Convert hex to bytes
+        ensureWebCrypto();
+        const keyBytes = hexToBytes256(keyHex); // Convert hex to bytes with validation
         const key = await crypto.subtle.importKey(
             "raw",
             keyBytes,
@@ -58,7 +97,11 @@ async function decryptData(keyHex, encryptedData) {
             ["decrypt"]
         );
 
-        const [ivBase64, ciphertextBase64] = encryptedData.split(":");
+        const parts = String(encryptedData).split(":");
+        if (parts.length !== 2) {
+            throw new Error("Invalid encrypted data format.");
+        }
+        const [ivBase64, ciphertextBase64] = parts;
         const iv = Uint8Array.from(atob(ivBase64).split("").map(char => char.charCodeAt(0)));
         const ciphertext = Uint8Array.from(atob(ciphertextBase64).split("").map(char => char.charCodeAt(0)));
 
@@ -131,16 +174,19 @@ async function generateSecurePassword(length = 16) {
 
     const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:<>,.?/";
     const charsetLength = charset.length;
+    const limit = Math.floor(256 / charsetLength) * charsetLength;
 
     const passwordArray = [];
     while (passwordArray.length < length) {
-        const randomValues = new Uint8Array(1);
+        const randomValues = new Uint8Array(64); // batch for fewer RNG calls
         crypto.getRandomValues(randomValues);
 
-        const randomValue = randomValues[0];
-        if (randomValue < Math.floor(256 / charsetLength) * charsetLength) {
-            const index = randomValue % charsetLength;
-            passwordArray.push(charset[index]);
+        for (let i = 0; i < randomValues.length && passwordArray.length < length; i++) {
+            const randomValue = randomValues[i];
+            if (randomValue < limit) {
+                const index = randomValue % charsetLength;
+                passwordArray.push(charset[index]);
+            }
         }
     }
 
@@ -187,7 +233,7 @@ async function generateDicewarePassphrase(numWords = 6, options = { addSeparator
         return wordlist[index];
     });
 
-    // Randomly capitalize at least one word
+    // Randomly capitalize at least one word (leave Math.random as requested)
     const capitalizeRandomWord = () => {
         const randomIndex = Math.floor(Math.random() * numWords);
         passphraseWords[randomIndex] = passphraseWords[randomIndex][0].toUpperCase() + passphraseWords[randomIndex].slice(1);
@@ -212,9 +258,9 @@ async function generateDicewarePassphrase(numWords = 6, options = { addSeparator
         passphrase = passphraseWords.join(" ");
     }
 
-    // Add a random 3-digit number at the end if required
+    // Add a random 3-digit number at the end if required (use CSPRNG)
     if (options.addNumber) {
-        const randomThreeDigitNumber = Math.floor(100 + Math.random() * 900); // Range: 100–999
+        const randomThreeDigitNumber = cryptoRandomInt(100, 1000); // Range: 100–999
         passphrase += randomThreeDigitNumber;
     }
 
