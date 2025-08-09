@@ -14,7 +14,17 @@
 
     <div class="container d-flex align-items-center main-content-container">
         <div class="container-sm inner-content-container" id="aboutContainer">
-            <h1><?php echo UI_TITLE; ?></h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><?php echo UI_TITLE; ?></h1>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="themeSelect" class="form-label mb-0 me-2">Theme</label>
+                    <select id="themeSelect" class="form-select form-select-sm" style="width:auto">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
             <hr>
             <h2>Password Generator</h2>
             <p>You can use this tool to generate a password or passphrase to use for your online accounts. This tool generates password <strong>in your browser</strong>, so our server will never see your generated passwords.</p>
@@ -35,7 +45,9 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-text" id="entropy"><strong>Entropy: </strong> <span id="entropyValue">0 bits</span></div>
-                        <button class="btn btn-primary" id="generatePassword">Generate Password</button>
+                        <!-- Compact entropy meter -->
+                        <div class="progress mt-2"><div id="entropyBar" class="progress-bar" style="width:0%" role="progressbar" aria-hidden="true"></div></div>
+                        <button class="btn btn-primary mt-2" id="generatePassword">Generate Password</button>
                     </div>
                     
                 </div>
@@ -60,7 +72,9 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-text" id="dicewareEntropy"><strong>Entropy: </strong> <span id="dicewareEntropyValue">0 bits</span></div>
-                        <button class="btn btn-primary" id="generateDiceware">Generate Diceware Passphrase</button>
+                        <!-- Compact entropy meter for Diceware -->
+                        <div class="progress mt-2"><div id="dicewareEntropyBar" class="progress-bar" style="width:0%" role="progressbar" aria-hidden="true"></div></div>
+                        <button class="btn btn-primary mt-2" id="generateDiceware">Generate Diceware Passphrase</button>
                     </div>
                 </div>
             </div>
@@ -68,6 +82,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/encryption.js?v=<?php echo CURRENT_VERSION; ?>"></script>
+    <!-- Shared UI helpers (toasts, tooltips) -->
+    <script src="/js/ui.js?v=<?php echo CURRENT_VERSION; ?>"></script>
     <script src="/js/pwgen.js?v=<?php echo CURRENT_VERSION; ?>"></script>
 </body>
 </html>

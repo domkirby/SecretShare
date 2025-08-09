@@ -30,9 +30,15 @@ $(document).ready(function() {
             $("#generatedPassword").trigger("input");
             const entropy = await calculatePasswordEntropy(password);
             $("#entropyValue").text(entropy.toFixed(2) + " bits");
+            const $bar = $("#entropyBar");
+            if ($bar.length) {
+                const pct = Math.min(100, Math.round((entropy / 128) * 100));
+                $bar.css("width", pct+"%");
+            }
             copyPasswordButton.on("click", function(e) {
                 e.preventDefault();
                 navigator.clipboard.writeText(password);
+                if (window.showToast) showToast("Password copied");
             });
         } catch(error) {
             tripError(error);
@@ -60,9 +66,15 @@ $(document).ready(function() {
             $("#generatedDiceware").trigger("input");
             const entropy = await calculatePasswordEntropy(passphrase);
             $("#dicewareEntropyValue").text(entropy.toFixed(2) + " bits");
+            const $dbar = $("#dicewareEntropyBar");
+            if ($dbar.length) {
+                const pct = Math.min(100, Math.round((entropy / 128) * 100));
+                $dbar.css("width", pct+"%");
+            }
             copyPassphraseButton.on("click", function(e) {
                 e.preventDefault();
                 navigator.clipboard.writeText(passphrase);
+                if (window.showToast) showToast("Passphrase copied");
             });
         } catch(error) {
             tripError(error);

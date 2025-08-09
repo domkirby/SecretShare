@@ -13,9 +13,19 @@
 
     <div class="container d-flex align-items-center main-content-container">
         <div class="container-sm inner-content-container" id="createSecretContainer">
-            <h1><?php echo UI_TITLE; ?></h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><?php echo UI_TITLE; ?></h1>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="themeSelect" class="form-label mb-0 me-2">Theme</label>
+                    <select id="themeSelect" class="form-select form-select-sm" style="width:auto">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
             <p><?php echo UI_HOME_EXPLAINER; ?></p>
-            <div class="alert alert-danger" id="errors" style="display: none;">
+            <div class="alert alert-danger" id="errors" style="display: none;" role="alert" aria-live="polite">
 
             </div>
             <?php if(! INSTALLED) { ?>
@@ -60,6 +70,10 @@
                         <input type="password" id="customPassword" class="form-control" minlength="8" disabled>
                         <button class="btn btn-outline-success" id="togglePassword" alt="Toggle Password Field Visibility" data-bs-toggle="tooltip" data-bs-title="Toggle password visibility"><i class="bi bi-eye-slash" id="togglePasswordInnerContent"></i></button>
                         <button class="btn btn-outline-primary" id="generatePasswordButton" alt="Generate A Password" data-bs-toggle="tooltip" data-bs-title="Generate a password"><i class="bi bi-arrow-clockwise"></i></button>
+                    </div>
+                    <!-- Visual strength meter (updated by home.js) -->
+                    <div class="progress strength mt-2" aria-hidden="true">
+                        <div id="passwordStrengthBar" class="progress-bar" role="progressbar"></div>
                     </div>
                     <div class="form-text">This password will be required to view the secret. <strong>Strength:</strong> <span id="passwordStrength">None</span></div>
                     <div class="alert alert-warning form-text"><strong>WARNING:</strong> If you use your own password, the encryption key will be derived from the password. Choose a good password. If you lose this password, it will be impossible to view the contents of the secret.</div>
@@ -107,7 +121,8 @@
     <script>
         const useDicewareForPasswordGeneration = <?php echo USE_DICEWARE_PASSWORD_GENERATOR ? 'true' : 'false'; ?>;
     </script>
-
+    <!-- Shared UI helpers (toasts, tooltips) -->
+    <script src="js/ui.js?v=<?php echo CURRENT_VERSION; ?>"></script>
     <script src="js/home.js?v=<?php echo CURRENT_VERSION; ?>"></script>
     <?php if(CLOUDFLARE_TURNSTILE_ENABLED) { ?>
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>

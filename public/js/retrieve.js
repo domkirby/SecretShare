@@ -46,6 +46,7 @@ $(document).ready(async function() {
                     $("#copySecretButton").on("click", function() {
                         navigator.clipboard.writeText(decryptedData);
                         $("#copySecretButton").text("Copied!");
+                        if (window.showToast) showToast("Secret copied");
                     });
                     if(data.deleted) {
                         $("#deleteSecretBtn").hide();
