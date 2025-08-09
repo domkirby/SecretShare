@@ -68,12 +68,28 @@ if (!window.showToast) {
   const current = getStoredTheme();
   applyTheme(current);
 
-  // Update UI control if present
+  // Back-compat: select control if present
   function syncSelect(val) {
     const sel = document.getElementById('themeSelect');
     if (sel) sel.value = val;
   }
+
+  // New: button group support
+  function syncButtons(val) {
+    const buttons = document.querySelectorAll('[data-theme-choice]');
+    if (!buttons.length) return;
+    buttons.forEach(btn => {
+      // Normalize to outline-primary
+      btn.classList.remove('btn-outline-secondary');
+      btn.classList.add('btn-outline-primary');
+      const isActive = btn.dataset.themeChoice === val;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
   syncSelect(current);
+  syncButtons(current);
 
   // Listen for changes in system preference when using 'system'
   media.addEventListener?.('change', () => {
@@ -82,15 +98,35 @@ if (!window.showToast) {
 
   // Bindings
   document.addEventListener('DOMContentLoaded', () => {
+    // Select handler (if exists)
     const sel = document.getElementById('themeSelect');
     if (sel) {
       sel.addEventListener('change', (e) => {
         const val = e.target.value; // 'light' | 'dark' | 'system'
         setStoredTheme(val);
         applyTheme(val);
+        syncButtons(val);
         if (window.showToast) showToast(`Theme: ${val}`);
       });
     }
+
+    // Button group handler
+    const btns = document.querySelectorAll('[data-theme-choice]');
+    btns.forEach(btn => {
+      // Normalize classes at bind time too
+      btn.classList.remove('btn-outline-secondary');
+      btn.classList.add('btn-outline-primary');
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.themeChoice;
+        setStoredTheme(val);
+        applyTheme(val);
+        syncSelect(val);
+        syncButtons(val);
+        if (window.showToast) showToast(`Theme: ${val}`);
+      });
+    });
+
+    // Optional cycle toggle
     const toggleBtn = document.getElementById('themeToggle');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
@@ -100,6 +136,7 @@ if (!window.showToast) {
         setStoredTheme(next);
         applyTheme(next);
         syncSelect(next);
+        syncButtons(next);
         if (window.showToast) showToast(`Theme: ${next}`);
       });
     }

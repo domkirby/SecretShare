@@ -14,13 +14,10 @@
         <div class="container-sm inner-content-container" id="retrieveSecretContainer">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="mb-0"><?php echo UI_TITLE; ?></h1>
-                <div class="d-flex align-items-center gap-2">
-                    <label for="themeSelect" class="form-label mb-0 me-2">Theme</label>
-                    <select id="themeSelect" class="form-select form-select-sm" style="width:auto">
-                        <option value="system">System</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                    </select>
+                <div class="btn-group" role="group" aria-label="Theme">
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="light" data-bs-toggle="tooltip" data-bs-title="Light"><i class="bi bi-sun"></i></button>
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="dark" data-bs-toggle="tooltip" data-bs-title="Dark"><i class="bi bi-moon"></i></button>
+                    <button type="button" class="btn btn-outline-primary" data-theme-choice="system" data-bs-toggle="tooltip" data-bs-title="System"><i class="bi bi-circle-half"></i></button>
                 </div>
             </div>
             <p><?php echo UI_RETRIEVE_EXPLAINER; ?></p>
