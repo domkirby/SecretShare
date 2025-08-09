@@ -1,8 +1,9 @@
 // Function to generate a random 256-bit key using SubtleCrypto
 async function generateRandomKey() {
+    ensureWebCrypto();
     const key = await crypto.subtle.generateKey(
         {
-            name: "AES-GCМ",
+            name: "AES-GCM", // fixed typo (was using a non-ASCII M)
             length: 256
         },
         true,
