@@ -6,6 +6,10 @@ if(! file_exists("../_config.php")) {
     die("Configuration file not found. Please copy _config.sample.php to _config.php and configure the settings.");
 }
 
+if ($_SERVER['HTTP_HOST'] !== 'localhost' && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on')) {
+    die("HTTPS is required. Please access this site over a secure connection.");
+}
+
 require_once("../_config.php");
 require("../_versioninfo.php");
 require_once("../vendor/autoload.php");
