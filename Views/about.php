@@ -12,7 +12,17 @@
 
     <div class="container d-flex align-items-center main-content-container">
         <div class="container-sm inner-content-container" id="aboutContainer">
-            <h1><?php echo UI_TITLE; ?></h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><?php echo UI_TITLE; ?></h1>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="themeSelect" class="form-label mb-0 me-2">Theme</label>
+                    <select id="themeSelect" class="form-select form-select-sm" style="width:auto">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
             <hr>
             <h2>About This Tool</h2>
             <p>This is a simple tool that allows you to create a secret message that can be shared with others.</p>
@@ -20,7 +30,7 @@
             <p>The secret is initially encrypted <i>on your device</i> before being sent to the server. This means that the server (or anyone with access to it) can never read the secret. Once the server receives the encrypted secret, it again encrypts it on the server side for additional protection before storing it.</p>
             <p>The link provided contains a special portion called a "hash" represented by (#). Everything after the hash is <i>not</i> sent to the server. The encryption key is contained in this hash, and is used by JavaScript <i>on your device</i> to decrypt the secret.</p>
             <p>Once the secret is viewed the maximum number of time, or the expiration time specified has elapsed, it is deleted from the database and can no longer be accessed.</p>
-            <p>For more information, please visit the <a href="https://github.com/domkirby/SecretShare" target="_blank">GitHub repository</a>.</p>
+            <p>For more information, please visit the <a href="https://github.com/domkirby/SecretShare" target="_blank" rel="noopener noreferrer">GitHub repository</a>.</p>
             <div class="mb-3">
                 <a href="/" class="btn btn-primary">Create a New Secret</a>
             </div>
@@ -29,14 +39,16 @@
                 <div class="card card-body">
                     This tool uses the following third-party libraries:
                     <ul>
-                        <li><a href="https://getbootstrap.com/" target="_blank">Bootstrap</a></li>
-                        <li><a href="https://github.com/bramus/router" target="_blank">Bramus Router</a></li>
-                        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank">Web Crypto API (built into your browser)</a></li>
+                        <li><a href="https://getbootstrap.com/" target="_blank" rel="noopener noreferrer">Bootstrap</a></li>
+                        <li><a href="https://github.com/bramus/router" target="_blank" rel="noopener noreferrer">Bramus Router</a></li>
+                        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener noreferrer">Web Crypto API (built into your browser)</a></li>
                     </ul>
                     <i>Written with the help of GitHub Copilot</i>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Shared UI helpers (toasts, tooltips, theme control) -->
+    <script src="/js/ui.js?v=<?php echo CURRENT_VERSION; ?>"></script>
 </body>
 </html>
