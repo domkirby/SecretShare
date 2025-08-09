@@ -45,8 +45,22 @@ $(document).ready(async function() {
                     $("#decryptedSecretContainer").show();
                     $("#copySecretButton").on("click", function() {
                         navigator.clipboard.writeText(decryptedData);
-                        $("#copySecretButton").text("Copied!");
+                        const $btn = $(this);
+                        $btn.text("Copied!");
                         if (window.showToast) showToast("Secret copied");
+
+                        // Clear any existing revert timer to avoid race conditions on rapid clicks
+                        const existing = $btn.data("resetTimeout");
+                        if (existing) clearTimeout(existing);
+
+                        // Revert back to "Copy" after 3 seconds with a short fade
+                        const timeoutId = setTimeout(function() {
+                            $btn.stop(true, true).fadeOut(150, function() {
+                                $btn.text("Copy").fadeIn(150);
+                            });
+                            $btn.removeData("resetTimeout");
+                        }, 3000);
+                        $btn.data("resetTimeout", timeoutId);
                     });
                     if(data.deleted) {
                         $("#deleteSecretBtn").hide();
