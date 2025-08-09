@@ -27,12 +27,41 @@ class SecretShareParser
         return time() + $additionalSeconds;
     }
 
+    // Accept raw bytes, Base64, or Base64URL salt and normalize to raw bytes
+    private static function normalizeSaltToBytes(string $salt): string
+    {
+        // Try standard Base64 (strict)
+        if ($salt !== '' && preg_match('/^[A-Za-z0-9+\/]+={0,2}$/', $salt)) {
+            $decoded = base64_decode($salt, true);
+            if ($decoded !== false) {
+                return $decoded;
+            }
+        }
+        // Try Base64URL
+        if ($salt !== '' && preg_match('/^[A-Za-z0-9\-_]+$/', $salt)) {
+            $b64 = strtr($salt, '-_', '+/');
+            $pad = strlen($b64) % 4;
+            if ($pad) {
+                $b64 .= str_repeat('=', 4 - $pad);
+            }
+            $decoded = base64_decode($b64, true);
+            if ($decoded !== false) {
+                return $decoded;
+            }
+        }
+        // Otherwise assume raw bytes already
+        return $salt;
+    }
+
     public static function prepareStorageArray(string $data, string $salt, int $iterations)
     {
-        $salt = bin2hex($salt);
+        // Normalize salt input, then store as hex
+        $saltBytes = self::normalizeSaltToBytes($salt);
+        $saltHex = bin2hex($saltBytes);
+
         $storageArray = [
             'sd' => $data,
-            'ss' => $salt,
+            'ss' => $saltHex,
             'si' => $iterations
         ];
 
@@ -46,7 +75,26 @@ class SecretShareParser
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('Failed to parse storage array: ' . json_last_error_msg());
         }
-        $parsedArray['ss'] = hex2bin($parsedArray['ss']);
+
+        // Validate required fields
+        foreach (['sd', 'ss', 'si'] as $k) {
+            if (!array_key_exists($k, $parsedArray)) {
+                throw new Exception("Missing field '$k' in storage array.");
+            }
+        }
+
+        // Validate hex-encoded salt and decode
+        if (!is_string($parsedArray['ss']) || (strlen($parsedArray['ss']) % 2 !== 0) || !ctype_xdigit($parsedArray['ss'])) {
+            throw new Exception('Invalid hex-encoded salt in storage array.');
+        }
+        $saltBytes = hex2bin($parsedArray['ss']);
+        if ($saltBytes === false) {
+            throw new Exception('Failed to decode hex-encoded salt.');
+        }
+
+        $parsedArray['ss'] = $saltBytes;
+        $parsedArray['si'] = (int)$parsedArray['si'];
+
         return $parsedArray;
     }
 }
