@@ -1,17 +1,30 @@
-// Function to generate a random 256-bit key using SubtleCrypto
+// Helper: base64url encode/decode
+function bytesToBase64Url(bytes) {
+    let bin = String.fromCharCode.apply(null, bytes);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlToBytes(str) {
+    // Pad string to length multiple of 4
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    let bin = atob(str);
+    return Uint8Array.from(bin, c => c.charCodeAt(0));
+}
+
+// Function to generate a random 256-bit key using SubtleCrypto, returns base64url
 async function generateRandomKey() {
     ensureWebCrypto();
     const key = await crypto.subtle.generateKey(
         {
-            name: "AES-GCM", // fixed typo (was using a non-ASCII M)
+            name: "AES-GCM",
             length: 256
         },
         true,
         ["encrypt", "decrypt"]
     );
-
     const exportedKey = await crypto.subtle.exportKey("raw", key);
-    return Array.from(new Uint8Array(exportedKey)).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Hexadecimal string
+    return bytesToBase64Url(new Uint8Array(exportedKey));
 }
 
 // Helper: ensure WebCrypto in secure context
@@ -35,6 +48,19 @@ function hexToBytes256(hex) {
     return Uint8Array.from(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
 }
 
+// Helper: detect key format and convert to bytes (hex or base64url)
+function keyToBytes(key) {
+    if (/^[0-9a-fA-F]{64}$/.test(key)) {
+        // legacy hex
+        return hexToBytes256(key);
+    } else if (/^[A-Za-z0-9\-_]{43,44}$/.test(key)) {
+        // base64url (43 or 44 chars for 256 bits)
+        return base64UrlToBytes(key);
+    } else {
+        throw new Error("Key must be 64 hex chars or base64url (43/44 chars)");
+    }
+}
+
 // Helper: CSPRNG integer with rejection sampling [min, max)
 function cryptoRandomInt(min, max) {
     const range = max - min;
@@ -51,10 +77,10 @@ function cryptoRandomInt(min, max) {
 }
 
 // Function to encrypt a string using AES-GCM
-async function encryptData(keyHex, plaintext) {
+async function encryptData(keyInput, plaintext) {
     try {
         ensureWebCrypto();
-        const keyBytes = hexToBytes256(keyHex); // Convert hex to bytes with validation
+        const keyBytes = keyToBytes(keyInput); // Accepts hex or base64url
         const key = await crypto.subtle.importKey(
             "raw",
             keyBytes,
@@ -85,10 +111,10 @@ async function encryptData(keyHex, plaintext) {
 }
 
 // Function to decrypt a string using AES-GCM
-async function decryptData(keyHex, encryptedData) {
+async function decryptData(keyInput, encryptedData) {
     try {
         ensureWebCrypto();
-        const keyBytes = hexToBytes256(keyHex); // Convert hex to bytes with validation
+        const keyBytes = keyToBytes(keyInput); // Accepts hex or base64url
         const key = await crypto.subtle.importKey(
             "raw",
             keyBytes,
@@ -153,12 +179,12 @@ async function generatePBKDF2Key(password, saltLength = 16, iterations = 350000,
     // Convert the derived bits to a Uint8Array
     const derivedKey = new Uint8Array(derivedBits);
 
-    // Convert the derived key to hex
-    const keyHex = Array.from(derivedKey).map(byte => byte.toString(16).padStart(2, '0')).join('');
+    // Convert the derived key to base64url
+    const keyB64Url = bytesToBase64Url(derivedKey);
 
-    // Return the derived key as hex, the salt as Base64, and the number of iterations
+    // Return the derived key as base64url, the salt as Base64, and the number of iterations
     return {
-        key: keyHex,
+        key: keyB64Url,
         salt: btoa(String.fromCharCode(...salt)),
         iterations: iterations,
         saltLength: salt.length

@@ -79,16 +79,16 @@ $(document).ready(function() {
         var isCustomPassword = false;
         const keysetPayload = {};
         var key = '';
-        if(passwordCheckbox.is(":checked")) {
-            const pbKeyset = await generatePBKDF2Key(passwordInput.val());
-            keysetPayload.salt = pbKeyset.salt;
-            keysetPayload.iterations = pbKeyset.iterations;
-            keysetPayload.saltLength = pbKeyset.saltLength;
-            key = pbKeyset.key;
-            isCustomPassword = true;
-        } else {
-            key = await generateRandomKey();
-        }
+    if(passwordCheckbox.is(":checked")) {
+      const pbKeyset = await generatePBKDF2Key(passwordInput.val());
+      keysetPayload.salt = pbKeyset.salt;
+      keysetPayload.iterations = pbKeyset.iterations;
+      keysetPayload.saltLength = pbKeyset.saltLength;
+      key = pbKeyset.key; // base64url
+      isCustomPassword = true;
+    } else {
+      key = await generateRandomKey(); // base64url
+    }
         const plaintext = $("#secret").val();
         submitBtn.prop("disabled", true);
         spinner.show();
@@ -111,11 +111,11 @@ $(document).ready(function() {
                     data: payload,
                     success: function(data) {
                         var secretUrl = '';
-                        if(isCustomPassword) {
-                            secretUrl = `https://${windowHost}/secret/${data.secret_id}`;
-                        } else {
-                            secretUrl = `https://${windowHost}/secret/${data.secret_id}#${key}`;
-                        }
+            if(isCustomPassword) {
+              secretUrl = `https://${windowHost}/secret/${data.secret_id}`;
+            } else {
+              secretUrl = `https://${windowHost}/secret/${data.secret_id}#${key}`; // base64url in hash
+            }
                         $("#secretLink").val(secretUrl);
                         $("#secretLinkContainer").show();
                         $("#createSecretContainer").hide();
