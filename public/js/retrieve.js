@@ -38,6 +38,7 @@ $(document).ready(async function() {
                     } else {
                         const hash = window.location.hash;
                         const secretKey = hash.substring(1);
+                        // Accept both base64url and legacy hex keys
                         decryptedData = await decryptData(secretKey, apiReturn.data);
                     }
                     $("#decryptedSecret").val(decryptedData);
